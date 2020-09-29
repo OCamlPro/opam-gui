@@ -17,5 +17,6 @@
   calendar
   geoip
   cohttp-lwt-unix
+  ez_file
   opam-file-format
   re))

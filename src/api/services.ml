@@ -11,3 +11,12 @@ let version : (version, exn, no_security) service0 =
     ~name:"version"
     ~output:version
     Path.(root // "version")
+
+
+(* Use OpamUtils.summary to parse the most useful fields *)
+let opam_config : (opam_config, exn, no_security) service0 =
+  service
+    ~section:section_main
+    ~name:"opam_config"
+    ~output:opam_config
+    Path.(root // "opam-config")

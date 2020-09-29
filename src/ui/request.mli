@@ -9,27 +9,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* For every added type, an encoding must be added in api/encoding.ml *)
+val init : (Types.www_server_info -> unit) -> unit
 
-type version = {
-  v_db: string;
-  v_db_version: int;
-}
+val version :
+  ?error:EzRequest.error_handler -> (Types.version -> unit) -> unit
 
-type www_server_info = {
-  www_apis : string list;
-}
-
-(* Information on the general configuration *)
-
-(* Use OpamUtils.summary opam_config to generate: *)
-type opam_config_summary = {
-  mutable repositories : string list ;
-  mutable installed_switches : string list ;
-  mutable switch : string option ;
-}
-
-type opam_config = {
-  opamroot : string ;
-  config : string ;
-}
+val opam_config :
+  ?error:EzRequest.error_handler -> (Types.opam_config -> unit) -> unit

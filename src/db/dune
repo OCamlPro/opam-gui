@@ -2,4 +2,4 @@
 (library
  (name ezopam_db)
  (wrapped false)
- (libraries ezopam_common opam-file-format ))
+ (libraries ezopam_common opam-file-format ez_file ))

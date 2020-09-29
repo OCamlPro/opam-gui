@@ -12,7 +12,7 @@ let route ?app path =
   match String.split_on_char '/' path with
   | [ path ] -> begin match path with
       | "db" ->
-        Request.get0 Services.version (fun {v_db; v_db_version} ->
+        Request.version (fun {v_db; v_db_version} ->
             app##.database := string v_db;
             app##.db_version_ := v_db_version)
       | "api" ->

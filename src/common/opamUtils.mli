@@ -9,27 +9,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* For every added type, an encoding must be added in api/encoding.ml *)
-
-type version = {
-  v_db: string;
-  v_db_version: int;
-}
-
-type www_server_info = {
-  www_apis : string list;
-}
-
-(* Information on the general configuration *)
-
-(* Use OpamUtils.summary opam_config to generate: *)
-type opam_config_summary = {
-  mutable repositories : string list ;
-  mutable installed_switches : string list ;
-  mutable switch : string option ;
-}
-
-type opam_config = {
-  opamroot : string ;
-  config : string ;
-}
+val summary : Types.opam_config -> Types.opam_config_summary

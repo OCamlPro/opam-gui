@@ -8,7 +8,7 @@
  (name api_lib)
  (wrapped false)
  (modules handlers api)
- (libraries ez-api.server api_services db_lwt))
+ (libraries ez-api.server api_services db))
 
 (executable
  (name api_server)

@@ -1,19 +1,10 @@
-# Skeleton
+# EZ-Opam
 
-Skeleton is a template of website using API REST with a postgresql DB and writter in OCaml.
+EZ-Opam is a GUI for Opam, the OCaml Package Manager.
 
 ## Setup
 
-You need to have postgresql installed (>= 9.5).
-You need to have a working setup of opam/ocaml (>=4.08.1): [Manual](https://opam.ocaml.org/doc/Install.html), with sandbox mode disabled ([article](https://camlspotter.gitlab.io/blog/2019-04-16-pgocaml/)) for postgresql to be working.
-In postgresql you should have a user with the same name as your computer user, with some specific rights:
-```
-sudo -i -u postgres
-psql
-CREATE USER <user>;
-ALTER ROLE <user> CREATEDB;
-ALTER ROLE <user> SET search_path TO db, public;
-```
+You need to have a working setup of opam/ocaml (>=4.08.1): [Manual](https://opam.ocaml.org/doc/Install.html)
 
 ## Building Dependencies
 
@@ -25,8 +16,7 @@ make init
 
 You can set up your project configuration (name, web server ports, ect..) by creating a file Makefile.config with these optional fields:
 ```
-PROJECT_NAME=skeleton              # name of your project
-DATABASE:=skeleton                 # name of your database
+PROJECT_NAME=ez-opam               # name of your project
 WEB_HOST:=http://localhost:8888    # external address of your WEB server
 API_HOST:=http://localhost:8080    # external address of your API server
 API_PORT:=8080                     # internal port of your API server

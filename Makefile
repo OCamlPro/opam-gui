@@ -1,5 +1,4 @@
-PROJECT_NAME:=skeleton
-DATABASE:=skeleton
+PROJECT_NAME:=ez-opam
 WEB_HOST:=http://localhost:8888
 API_HOST:=http://localhost:8080
 API_PORT:=8080
@@ -11,21 +10,9 @@ VERSION:=1.0
 
 .EXPORT_ALL_VARIABLES:
 
-PGDATABASE=$(DATABASE)
-
 all: build website api-server openapi
 
-db-updater:
-	@dune build src/db/db-update
-
-config/db-version.txt:
-	@mkdir -p config
-	@echo 0 > config/db-version.txt
-
-db-update: config/db-version.txt db-updater
-	@_build/default/src/db/db-update/db_updater.exe --witness config/db-version.txt --database $(PGDATABASE)
-
-build: db-update
+build:
 	dune build --profile release
 
 website:

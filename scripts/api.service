@@ -1,5 +1,5 @@
 [Unit]
-Description  = Skeleton API
+Description  = EZ-Opam API
 Wants        = network-online.target postgresql.service postgresql@.service
 After        = network-online.target postgresql.service postgresql@.service
 

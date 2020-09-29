@@ -1,5 +1,5 @@
 open Lwt.Infix
-open Data_types
+open Types
 (* open Services *)
 
 let to_api p = Lwt.bind p EzAPIServerUtils.return

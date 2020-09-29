@@ -1,5 +1,5 @@
 open Json_encoding
-open Data_types
+open Types
 
 let version = conv
   (fun {v_db; v_db_version} -> (v_db, v_db_version))

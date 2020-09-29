@@ -1,0 +1,4 @@
+(library
+ (name project_config)
+ (wrapped false)
+ (modules pConfig))

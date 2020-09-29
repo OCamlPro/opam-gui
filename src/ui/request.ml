@@ -1,4 +1,4 @@
-open Data_types
+open Types
 module S = Services
 
 let host = ref (EzAPI.TYPES.BASE PConfig.web_host)

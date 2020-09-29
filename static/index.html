@@ -54,6 +54,20 @@
         </div>
       </b-container>
 
+
+      <!-- Switches -->
+      <b-container v-if="path=='switches'">
+
+        <b-table striped hover :items="switches"></b-table>
+
+        <!-- <ol> -->
+        <!--   <li v-for="switch in switches"> -->
+        <!--     {{ switch }} -->
+        <!--   </li> -->
+        <!-- </ol> -->
+      </b-container>
+
+
     </div>
   </body>
 </html>

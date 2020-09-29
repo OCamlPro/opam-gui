@@ -1,6 +1,5 @@
 
 (library
- (name db)
+ (name ezopam_db)
  (wrapped false)
- (modules db)
- (libraries data_common))
+ (libraries ezopam_common opam-file-format ))

@@ -9,20 +9,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lwt.Infix
-open Types
-open EzFile.OP
+val init : (Types.www_server_info -> unit) -> unit
 
-let to_api p = Lwt.bind p EzAPIServerUtils.return
+val version :
+  ?error:EzRequest.error_handler -> (Types.version -> unit) -> unit
 
-let version _params () = to_api (
-    Db.get_version () |> fun v_db_version ->
-    Lwt.return (Ok { v_db = "none"; v_db_version }))
-
-let opam_config _req () =
-  to_api @@ (
-  let opamroot = Opam.opamroot_dir in
-  Lwt.return (Ok {
-      opamroot ;
-      config = EzFile.read_file ( opamroot // "config" )
-    }))
+val opam_config :
+  ?error:EzRequest.error_handler -> (Types.opam_config -> unit) -> unit

@@ -1,3 +1,14 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (c) 2020 OCamlPro SAS                                       *)
+(*                                                                        *)
+(*  All rights reserved.                                                  *)
+(*  This file is distributed under the terms of the GNU Lesser General    *)
+(*  Public License version 2.1, with the special exception on linking     *)
+(*  described in the LICENSE.md file in the root directory.               *)
+(*                                                                        *)
+(**************************************************************************)
+
 open Types
 module S = Services
 
@@ -31,3 +42,6 @@ let init f =
        let api = List.nth www_apis (Random.int @@ List.length www_apis) in
        host := EzAPI.TYPES.BASE api;
        f info)
+
+let version ?error f = get0 S.version ?error f
+let opam_config ?error f = get0 S.opam_config ?error f

@@ -1,4 +1,0 @@
-(executable
- (name db_updater)
- (modules db_updater)
- (libraries versions))

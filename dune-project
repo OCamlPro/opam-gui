@@ -1,22 +1,20 @@
 (lang dune 2.4)
-(name skeleton)
+(name ez-opam)
 
-(source (uri git://gitlab.com/o-labs/skeleton))
+(source (uri git://github.com/OCamlPro/ez-opam))
 (license MIT)
-(authors "John Doe")
-(maintainers "john.doe@origin-labs.com")
-(homepage https://gitlab.com/o-labs/skeleton)
-(bug_reports https://gitlab.com/o-labs/skeleton/-/issues)
+(authors "Fabrice Le Fessant" "David Declerck")
+(maintainers "david.declerck@ocamlpro.com")
+(homepage https://github.com/OCamlPro/ez-opam)
+(bug_reports https://github.com/OCamlPro/ez-opam/-/issues)
 
 (package
- (name skeleton)
- (synopsis "Skeleton of website with API REST")
+ (name ez-opam)
+ (synopsis "A GUI for Opam")
  (depends
   vue-jsoo
   ez-api
   calendar
   geoip
   cohttp-lwt-unix
-  re
-  pgocaml_ppx
-  ez-pgocaml))
+  re))

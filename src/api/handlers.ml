@@ -7,5 +7,5 @@ let to_api p =
   EzAPIServerUtils.return p
 
 let version _params () = to_api (
-    Db.get_version () >|= fun v_db_version ->
-    Ok { v_db = PConfig.database; v_db_version })
+    Db.get_version () |> fun v_db_version ->
+    Lwt.return (Ok { v_db = "none"; v_db_version }))

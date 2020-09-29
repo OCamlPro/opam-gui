@@ -1,4 +1,5 @@
 (library
- (name misc)
+ (name ezopam_misc)
  (modules misc)
- (libraries project_config stdlib-shims))
+ (wrapped false)
+ (libraries ezopam_config stdlib-shims))

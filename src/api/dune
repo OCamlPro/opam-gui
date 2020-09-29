@@ -1,21 +1,21 @@
 (library
- (name api_services)
+ (name ezopam_services)
  (wrapped false)
  (modules encoding services)
- (libraries ez-api.common data_common))
+ (libraries ez-api.common ezopam_common))
 
 (library
- (name api_lib)
+ (name ezopam_api)
  (wrapped false)
  (modules handlers api)
- (libraries ez-api.server api_services db))
+ (libraries ez-api.server ezopam_services ezopam_db))
 
 (executable
  (name api_server)
  (modules api_server)
- (libraries api_lib))
+ (libraries ezopam_api))
 
 (executable
  (name openapi)
  (modules openapi doc)
- (libraries api_lib))
+ (libraries ezopam_api))

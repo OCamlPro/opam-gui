@@ -1,4 +1,4 @@
 (library
- (name project_config)
+ (name ezopam_config)
  (wrapped false)
  (modules pConfig))

@@ -1,4 +1,4 @@
 (library
- (name data_common)
+ (name ezopam_common)
  (wrapped false)
- (libraries misc))
+ (libraries ezopam_misc))

@@ -21,6 +21,8 @@ let route ?app path =
           (string "openapi.json")
           (Unsafe.obj [|"scrollYOffset", Unsafe.inject 50|])
           (Dom_html.getElementById_exn "redoc")
+      | "switches" ->
+          app##.switches := app##.switches
       | _ -> ()
     end
   | _ -> ()

@@ -1,5 +1,8 @@
-www
-bin
+/www
+/bin
 config
 *.merlin
 _build
+/Makefile.config
+*~
+/src/config/pConfig.ml

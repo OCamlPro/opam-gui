@@ -1,21 +1,21 @@
 (library
- (name ezopam_miscjs)
+ (name opamgui_miscjs)
  (modules misc_js)
  (preprocess (pps js_of_ocaml-ppx))
  (libraries js_of_ocaml))
 
 (library
- (name ezopam_ui)
+ (name opamgui_ui)
  (wrapped false)
  (modules common v request route)
  (preprocess (pps js_of_ocaml-ppx))
- (libraries ezopam_common ezopam_miscjs vue-jsoo ez-api.xhr))
+ (libraries opamgui_common opamgui_miscjs vue-jsoo ez-api.xhr))
 
 (executable
  (name main_ui)
  (modules main_ui)
  (preprocess (pps js_of_ocaml-ppx))
- (libraries ezopam_ui)
+ (libraries opamgui_ui)
  (modes js)
  (js_of_ocaml
   (flags (:standard --no-sourcemap))))

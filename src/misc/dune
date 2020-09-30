@@ -1,5 +1,5 @@
 (library
- (name ezopam_misc)
+ (name opamgui_misc)
  (modules misc)
  (wrapped false)
- (libraries ezopam_config stdlib-shims))
+ (libraries opamgui_config stdlib-shims))

@@ -1,6 +1,6 @@
-# EZ-Opam
+# Opam-gui
 
-EZ-Opam is a GUI for Opam, the OCaml Package Manager.
+Opam-Gui is a GUI for Opam, the OCaml Package Manager.
 
 ## Setup
 
@@ -16,7 +16,7 @@ make init
 
 You can set up your project configuration (name, web server ports, ect..) by creating a file Makefile.config with these optional fields:
 ```
-PROJECT_NAME=ez-opam               # name of your project
+PROJECT_NAME=opam-gui               # name of your project
 WEB_HOST:=http://localhost:8888    # external address of your WEB server
 API_HOST:=http://localhost:8080    # external address of your API server
 API_PORT:=8080                     # internal port of your API server

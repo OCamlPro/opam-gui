@@ -1,4 +1,4 @@
 (library
- (name ezopam_common)
+ (name opamgui_common)
  (wrapped false)
- (libraries ezopam_misc ez-api.common opam-file-format))
+ (libraries opamgui_misc ez-api.common opam-file-format ocplib_stuff))

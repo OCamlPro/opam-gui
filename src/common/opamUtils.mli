@@ -9,9 +9,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val summary :
-  opamroot:string ->
-  opam_config:string ->
+val opam_config_summary :
+  Types.global_state ->
   Types.opam_config_summary
 
 (*

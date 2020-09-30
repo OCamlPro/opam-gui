@@ -1,16 +1,16 @@
 
 (library
- (name ezopam_api)
+ (name opamgui_api)
  (wrapped false)
  (modules handlers api)
- (libraries ez-api.server ezopam_db))
+ (libraries ez-api.server opamgui_db))
 
 (executable
  (name opam_gui)
  (modules opam_gui)
- (libraries ezopam_api ezopam_config))
+ (libraries opamgui_api opamgui_config))
 
 (executable
  (name openapi)
  (modules openapi doc)
- (libraries ezopam_api))
+ (libraries opamgui_api))

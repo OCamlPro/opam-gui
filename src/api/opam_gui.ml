@@ -20,6 +20,9 @@ let gui_dirname = Opam.opamroot_dir // "plugins" // "opam-gui"
 let config_filename = gui_dirname // "config"
 let pid_filename = gui_dirname // "pid"
 
+let plugins_bin = Opam.opamroot_dir // "plugins" // "bin"
+let plugins_filename = plugins_bin // "opam-gui"
+
 let random_token () =
   let b = Bytes.create 20 in
   for i = 0 to Bytes.length b - 1 do
@@ -73,12 +76,39 @@ let main () =
     | Some old_config ->
       old_config, { old_config with port = old_config.port }
   in
+  let launch_browser = ref true in
+  let start_server = ref true in
   Arg.parse [
     "-stop", Arg.Unit (fun () -> stop_server (); exit 0),
     "Stop the server";
+    "-port", Arg.Int (fun port -> config.port <- port),
+    "Change the port";
+    "-server", Arg.Clear launch_browser, "Don't launch browser";
+    "-browser", Arg.Clear start_server, "Don't start server";
   ] (fun s ->
       Printf.kprintf failwith "Unexpected argument %S" s)
     "opam-gui server and client" ;
+
+  begin
+    let old_content =
+      if Sys.file_exists plugins_filename then
+        EzFile.read_file plugins_filename
+      else
+        ""
+    in
+    let filename = Sys.argv.(0) in
+    let filename =
+      if Filename.is_relative filename then
+        Sys.getcwd () // filename
+      else
+        filename
+    in
+    let new_content = Printf.sprintf "#!/bin/sh\nexec %s $*\n" filename in
+    if new_content <> old_content then begin
+      EzFile.write_file plugins_filename new_content;
+      Unix.chmod plugins_filename 0o755
+    end
+  end;
 
   let server_is_running =
     if Sys.file_exists pid_filename then
@@ -90,6 +120,8 @@ let main () =
         false
       | () ->
         if old_config <> config then begin
+          if not !start_server then
+            failwith "Running server with different config";
           stop_server ();
           false
         end else
@@ -97,38 +129,49 @@ let main () =
     else
       false
   in
-  let processes =
-    if server_is_running then begin
-      Printf.eprintf "Process is already running\n%!";
+  let start_server_lwt =
+    if !start_server then
+      if server_is_running then begin
+        Printf.eprintf "Process is already running\n%!";
+        Lwt.return_unit
+      end else begin
+        EzFile.make_dir ~p:true gui_dirname;
+        EzFile.write_file config_filename
+          ( Json_encoding.construct Encoding.config config
+            |> Ezjsonm.value_to_string );
+        EzFile.write_file pid_filename
+          (string_of_int (Unix.getpid ()));
+        let servers = [
+          config.port,
+          EzAPIServerUtils.Root ( share_www, Some "/index.html" );
+          config.port+1, EzAPIServerUtils.API Api.services ;
+        ] in
+        Printf.eprintf "Starting servers on ports [%s]\n%!"
+          (String.concat ","
+             (List.map (fun (port,_) ->
+                  string_of_int port) servers));
+        EzAPIServer.server ~catch servers
+      end
+    else
       Lwt.return_unit
-    end else begin
-      EzFile.make_dir ~p:true gui_dirname;
-      EzFile.write_file pid_filename
-        (string_of_int (Unix.getpid ()));
-      let servers = [
-        config.port,
-        EzAPIServerUtils.Root ( share_www, None );
-        config.port+1, EzAPIServerUtils.API Api.services ;
-      ] in
-      Printf.eprintf "Starting servers on ports [%s]\n%!"
-        (String.concat ","
-           (List.map (fun (port,_) ->
-                string_of_int port) servers));
-      EzAPIServer.server ~catch servers
-    end
   in
-  let processes =
-    Lwt.join [ processes ;
-               Lwt.bind
-                 (Lwt_unix.sleep 1.0 )
-                 (fun () ->
-                    ignore (
-                      Printf.kprintf Sys.command
-                        "xdg-open http://127.0.0.1:%d/index.html"
-                        config.port);
-                    Lwt.return_unit
-                 )
-             ]
+  let launch_browser_lwt =
+    let call_xdg () =
+      ignore (
+        Printf.kprintf Sys.command
+          "xdg-open http://127.0.0.1:%d/"
+          config.port);
+      Lwt.return_unit
+    in
+    if !start_server && not server_is_running then
+      Lwt.bind
+        (Lwt_unix.sleep 1.0 )
+        call_xdg
+    else
+      call_xdg ()
+  in
+  let processes = Lwt.join [
+      start_server_lwt ; launch_browser_lwt ]
   in
   Lwt_main.run processes
 
@@ -136,12 +179,5 @@ let () =
   main ()
 
 (*
-    let () =
-      let www_port = ref 16900 in
-      ignore ( Printf.kprintf Sys.command
-                 "opam-gui-server --api-port %d --www-port %d &"
-                 !api_port !www_port
-             );
-      Unix.sleep 1;
-      ()
+╰─➤ EZAPISERVER=3 ./bin/opam-gui -port 8080
 *)

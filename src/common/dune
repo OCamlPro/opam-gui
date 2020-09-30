@@ -1,4 +1,4 @@
 (library
  (name ezopam_common)
  (wrapped false)
- (libraries ezopam_misc opam-file-format))
+ (libraries ezopam_misc ez-api.common opam-file-format))

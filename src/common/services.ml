@@ -10,15 +10,24 @@
 (**************************************************************************)
 
 open Types
-open EzFile.OP
-(* open OpamParserTypes *)
+open Encoding
+open EzAPI
 
-let home_dir =
-  try Sys.getenv "HOME" with
-  | Not_found -> failwith "HOME variable not defined"
+let section_main = section "API"
+let sections = [ section_main ]
 
-let opamroot_dir =
-  try
-    Sys.getenv "OPAMROOT"
-  with
-  | Not_found -> home_dir // ".opam"
+let version : (version, exn, no_security) service0 =
+  service
+    ~section:section_main
+    ~name:"version"
+    ~output:version
+    Path.(root // "version")
+
+
+(* Use OpamUtils.summary to parse the most useful fields *)
+let opam_config : (opam_config, exn, no_security) service0 =
+  service
+    ~section:section_main
+    ~name:"opam_config"
+    ~output:opam_config
+    Path.(root // "opam-config")

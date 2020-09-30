@@ -11,13 +11,14 @@
 
 (* For every added type, an encoding must be added in api/encoding.ml *)
 
+type config = {
+  mutable port : int ;
+  mutable token : string ;
+}
+
 type version = {
   v_db: string;
   v_db_version: int;
-}
-
-type www_server_info = {
-  www_apis : string list;
 }
 
 (* Information on the general configuration *)

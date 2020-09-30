@@ -1,6 +1,8 @@
 (lang dune 2.4)
 (name ez-opam)
 
+(generate_opam_files false)
+
 (source (uri git://github.com/OCamlPro/ez-opam))
 (license MIT)
 (authors "Fabrice Le Fessant" "David Declerck")

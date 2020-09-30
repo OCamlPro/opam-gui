@@ -13,13 +13,22 @@ let html_escaped s =
   done;
   Buffer.contents b
 
-let host () =
-  let host =
-    match Url.url_of_string (Js.to_string Dom_html.window##.location##.href) with
-    | Some (Url.Http hu) -> Misc.spf "http://%s:%d" hu.Url.hu_host hu.Url.hu_port
-    | Some (Url.Https hu) -> Misc.spf "https://%s:%d" hu.Url.hu_host hu.Url.hu_port
-    | _ -> PConfig.web_host in
-  EzAPI.TYPES.BASE host
+let www_host, api_host =
+  match Url.url_of_string
+          (Js.to_string Dom_html.window##.location##.href) with
+  | Some (Url.Http hu) ->
+    Printf.sprintf "http://%s:%d" hu.Url.hu_host hu.Url.hu_port,
+    Printf.sprintf "http://%s:%d" hu.Url.hu_host ( hu.Url.hu_port + 1)
+  | Some (Url.Https hu) ->
+    Printf.sprintf "https://%s:%d" hu.Url.hu_host hu.Url.hu_port,
+    Printf.sprintf "https://%s:%d" hu.Url.hu_host ( hu.Url.hu_port+ 1)
+  | _ ->
+    Printf.sprintf "http://127.0.0.1:%d" PConfig.port,
+    Printf.sprintf "http://127.0.0.1:%d" ( PConfig.port + 1)
+(*  EzAPI.TYPES.BASE host *)
+
+let () = Printf.printf "Web host: %s\n%!" www_host
+let () = Printf.printf "API host: %s\n%!" api_host
 
 let logs s = Firebug.console##log (Js.string s)
 

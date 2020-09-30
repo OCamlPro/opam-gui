@@ -1,5 +1,6 @@
 /www
 /bin
+/share
 config
 *.merlin
 _build

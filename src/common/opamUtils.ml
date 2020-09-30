@@ -43,3 +43,7 @@ let summary opam_config =
         | _ -> ()
     ) file.file_contents;
   summary
+
+(*
+OpamFile.SwitchSelections.read (OpamFile.make (OpamFilename.of_string string));;
+*)

@@ -11,6 +11,26 @@ let route ?app path =
   app##.path := string path;
   match String.split_on_char '/' path with
   | [ path ] -> begin match path with
+      | "" ->
+
+        Request.opam_config (fun c ->
+            let s = OpamUtils.summary c in
+            let switches =
+              List.rev @@ List.map (fun sw ->
+                  let current =
+                    match s.switch with
+                    | None -> false
+                    | Some sw' -> String.equal sw sw'
+                  in
+                  (sw, current)
+                ) s.installed_switches
+            in
+
+            app##.switches := V.list_to_js V.switch_to_js switches
+        );
+
+        app##.packages := app##.packages;
+
       | "db" ->
         Request.version (fun {v_db; v_db_version} ->
             app##.database := string v_db;
@@ -21,8 +41,6 @@ let route ?app path =
           (string "openapi.json")
           (Unsafe.obj [|"scrollYOffset", Unsafe.inject 50|])
           (Dom_html.getElementById_exn "redoc")
-      | "switches" ->
-          app##.switches := app##.switches
       | _ -> ()
     end
   | _ -> ()

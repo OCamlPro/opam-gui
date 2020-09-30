@@ -14,7 +14,9 @@ let route ?app path =
       | "" ->
 
         Request.opam_config (fun c ->
-            let s = OpamUtils.summary c in
+            let s = OpamUtils.summary
+                ~opamroot:c.opamroot
+                ~opam_config:c.opam_config in
             let switches =
               List.rev @@ List.map (fun sw ->
                   let current =

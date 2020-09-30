@@ -30,7 +30,16 @@ type opam_config_summary = {
   mutable switch : string option ;
 }
 
+type switch_config = {
+  switch_name : string ;
+  switch_dirname : string ;
+  switch_state : string option ;
+  switch_config : string option ;
+  switch_time : int64 ;
+}
+
 type opam_config = {
-  opamroot : string ;
-  config : string ;
+  opamroot : string ; (* directory of opam *)
+  opam_config : string ;   (* config of opam *)
+  switches : ( string * switch_config ) list ;
 }

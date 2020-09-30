@@ -156,19 +156,22 @@ let main () =
       Lwt.return_unit
   in
   let launch_browser_lwt =
-    let call_xdg () =
-      ignore (
-        Printf.kprintf Sys.command
-          "xdg-open http://127.0.0.1:%d/"
-          config.port);
-      Lwt.return_unit
-    in
-    if !start_server && not server_is_running then
-      Lwt.bind
-        (Lwt_unix.sleep 1.0 )
-        call_xdg
+    if !launch_browser then
+      let call_xdg () =
+        ignore (
+          Printf.kprintf Sys.command
+            "xdg-open http://127.0.0.1:%d/"
+            config.port);
+        Lwt.return_unit
+      in
+      if !start_server && not server_is_running then
+        Lwt.bind
+          (Lwt_unix.sleep 1.0 )
+          call_xdg
+      else
+        call_xdg ()
     else
-      call_xdg ()
+      Lwt.return_unit
   in
   let processes = Lwt.join [
       start_server_lwt ; launch_browser_lwt ]

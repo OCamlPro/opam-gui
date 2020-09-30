@@ -3,8 +3,8 @@ synopsis: "A GUI for Opam"
 maintainer: ["david.declerck@ocamlpro.com"]
 authors: ["Fabrice Le Fessant" "David Declerck"]
 license: "MIT"
-homepage: "https://github.com/OCamlPro/ez-opam"
-bug-reports: "https://github.com/OCamlPro/ez-opam/-/issues"
+homepage: "https://github.com/OCamlPro/opam-gui"
+bug-reports: "https://github.com/OCamlPro/opam-gui/-/issues"
 depends: [
   "dune" {>= "2.4"}
   "vue-jsoo"
@@ -15,6 +15,9 @@ depends: [
   "ez_file"
   "opam-file-format"
   "re"
+  "opam-format"
+  "opam-state"
+  "ocplib_stuff"
 ]
 build: [
   [ make "config" ]
@@ -36,7 +39,7 @@ install: [
   [ "cp" "-f" "_build/default/src/api/opam_gui.exe" "%{bin}%/opam-gui" ]
   [ "cp" "-R" "www" "%{share}%/www" ]
 ]
-dev-repo: "git://github.com/OCamlPro/ez-opam"
+dev-repo: "git://github.com/OCamlPro/opam-gui"
 pin-depends: [
   [ "ez-api.~dev" "git+https://github.com/ocamlpro/ez-api.git" ]
 ]

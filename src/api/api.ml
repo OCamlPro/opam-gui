@@ -9,7 +9,7 @@ module MakeRegisterer(S: module type of Services)(H:module type of Handlers) = s
   let register dir =
     dir
   |> register S.version H.version
-  |> register S.opam_config H.opam_config
+  |> register S.global_state H.global_state
 
 end
 

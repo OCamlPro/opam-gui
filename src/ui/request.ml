@@ -47,4 +47,4 @@ let init f =
 *)
 
 let version ?error f = get0 S.version ?error f
-let opam_config ?error f = get0 S.opam_config ?error f
+let global_state ?error f = get0 S.global_state ?error f

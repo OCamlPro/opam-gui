@@ -9,25 +9,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Types
-open Encoding
-open EzAPI
+val version :
+  EzAPI.request ->
+  unit ->
+  (Types.version, exn) result RestoDirectory1.Answer.answer Lwt.t
 
-let section_main = section "API"
-let sections = [ section_main ]
-
-let version : (version, exn, no_security) service0 =
-  service
-    ~section:section_main
-    ~name:"version"
-    ~output:version
-    Path.(root // "version")
-
-
-(* Use OpamUtils.summary to parse the most useful fields *)
-let global_state : (global_state, exn, no_security) service0 =
-  service
-    ~section:section_main
-    ~name:"opam_config"
-    ~output:global_state
-    Path.(root // "global_state")
+val global_state :
+  EzAPI.request ->
+  unit ->
+  (Types.global_state, exn) result RestoDirectory1.Answer.answer Lwt.t

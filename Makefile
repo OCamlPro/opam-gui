@@ -1,8 +1,8 @@
-PROJECT_NAME:=ez-opam
-PORT:=9988
+PROJECT_NAME:=opam-gui
 VERSION:=1.0
 WWW_DIR:=share/$(PROJECT_NAME)/www
 
+PORT:=9988
 -include Makefile.config
 
 .EXPORT_ALL_VARIABLES:
@@ -34,9 +34,7 @@ build-deps:
 
 Makefile.config: Makefile
 	echo > Makefile.config
-	echo PROJECT_NAME:=$(PROJECT_NAME) >> Makefile.config
 	echo PORT:=$(PORT) >> Makefile.config
-	echo VERSION:=$(VERSION) >> Makefile.config
 
 src/config/pConfig.ml: Makefile.config
 	echo "let project = {|$(PROJECT_NAME)|}" > src/config/pConfig.ml

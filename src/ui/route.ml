@@ -13,10 +13,9 @@ let route ?app path =
   | [ path ] -> begin match path with
       | "" ->
 
-        Request.opam_config (fun c ->
-            let s = OpamUtils.summary
-                ~opamroot:c.opamroot
-                ~opam_config:c.opam_config in
+        Request.global_state (fun ( gs : Types.global_state ) ->
+            let s = OpamUtils.opam_config_summary
+                gs in
             let switches =
               List.rev @@ List.map (fun sw ->
                   let current =
@@ -29,7 +28,7 @@ let route ?app path =
             in
 
             app##.switches := V.list_to_js V.switch_to_js switches
-        );
+          );
 
         app##.packages := app##.packages;
 

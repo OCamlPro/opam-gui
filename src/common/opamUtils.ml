@@ -11,6 +11,7 @@
 
 open Types
 open OpamParserTypes
+open EzCompat
 
 let expect_error ty s =
   Printf.kprintf failwith
@@ -22,27 +23,12 @@ let string = function
 
 let string_list list = List.map string list
 
-let summary ~opamroot ~opam_config =
-  let file = OpamParser.string opam_config
-      (Filename.concat opamroot "config" ) in
-  let summary = {
-    repositories = [];
-    installed_switches = [];
-    switch = None;
-  } in
-  List.iter (function
-      | Section _ -> ()
-      | Variable (_pos, name, v) ->
-        match name, v with
-        | "repositories", List (_pos, list) ->
-          summary.repositories <- string_list list
-        | "installed-switches", List (_pos, list) ->
-          summary.installed_switches <- string_list list
-        | "switch", String (_pos, s) ->
-          summary.switch <- Some s
-        | _ -> ()
-    ) file.file_contents;
-  summary
+let opam_config_summary gs =
+  {
+    repositories = gs.repos_list;
+    installed_switches = StringMap.bindings gs.switches |> List.map fst;
+    switch = gs.opam_config.config_current_switch;
+  }
 
 (* Unfortunately, OpamFile from opam-format cannot be used in JSOO:
 

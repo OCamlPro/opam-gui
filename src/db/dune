@@ -1,5 +1,5 @@
 
 (library
- (name ezopam_db)
+ (name opamgui_db)
  (wrapped false)
- (libraries ezopam_common opam-file-format ez_file ))
+ (libraries opamgui_common opam-file-format ez_file opam-state))

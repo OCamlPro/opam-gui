@@ -9,8 +9,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val init : (Types.www_server_info -> unit) -> unit
-
 val version :
   ?error:EzRequest.error_handler -> (Types.version -> unit) -> unit
 

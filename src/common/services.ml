@@ -9,28 +9,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* For every added type, an encoding must be added in api/encoding.ml *)
+open Types
+open Encoding
+open EzAPI
 
-type config = {
-  mutable port : int ;
-  mutable token : string ;
-}
+let section_main = section "API"
+let sections = [ section_main ]
 
-type version = {
-  v_db: string;
-  v_db_version: int;
-}
+let version : (version, exn, no_security) service0 =
+  service
+    ~section:section_main
+    ~name:"version"
+    ~output:version
+    Path.(root // "version")
 
-(* Information on the general configuration *)
 
-(* Use OpamUtils.summary opam_config to generate: *)
-type opam_config_summary = {
-  mutable repositories : string list ;
-  mutable installed_switches : string list ;
-  mutable switch : string option ;
-}
-
-type opam_config = {
-  opamroot : string ;
-  config : string ;
-}
+(* Use OpamUtils.summary to parse the most useful fields *)
+let opam_config : (opam_config, exn, no_security) service0 =
+  service
+    ~section:section_main
+    ~name:"opam_config"
+    ~output:opam_config
+    Path.(root // "opam-config")

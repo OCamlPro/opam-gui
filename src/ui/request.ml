@@ -12,7 +12,8 @@
 open Types
 module S = Services
 
-let host = ref (EzAPI.TYPES.BASE PConfig.web_host)
+let api_host = EzAPI.TYPES.BASE Common.api_host
+
 
 let wrap_res ?error f = function
   | Ok x -> f x
@@ -20,11 +21,12 @@ let wrap_res ?error f = function
     | None -> Common.logs s
     | Some e -> e 500 (Some s)
 
-let get0 ?post ?headers ?params ?error ?(msg="") ?(host= !host) service f =
+let get0 ?post ?headers ?params ?error ?(msg="") ?(host= api_host) service f =
   EzRequest.ANY.get0 host service msg ?post ?headers ?error ?params (wrap_res ?error f) ()
-let get1 ?post ?headers ?params ?error ?(msg="") ?(host= !host) service f arg =
+let get1 ?post ?headers ?params ?error ?(msg="") ?(host= api_host) service f arg =
   EzRequest.ANY.get1 host service msg ?post ?headers ?error ?params (wrap_res ?error f) arg
 
+(*
 let info_service : (www_server_info, exn, EzAPI.no_security) EzAPI.service0 =
   EzAPI.service
     ~output:Encoding.info_encoding
@@ -42,6 +44,7 @@ let init f =
        let api = List.nth www_apis (Random.int @@ List.length www_apis) in
        host := EzAPI.TYPES.BASE api;
        f info)
+*)
 
 let version ?error f = get0 S.version ?error f
 let opam_config ?error f = get0 S.opam_config ?error f

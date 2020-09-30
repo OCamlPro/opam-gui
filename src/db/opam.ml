@@ -11,7 +11,7 @@
 
 open Types
 open EzFile.OP
-open OpamParserTypes
+(* open OpamParserTypes *)
 
 let home_dir =
   try Sys.getenv "HOME" with

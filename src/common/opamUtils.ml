@@ -22,9 +22,9 @@ let string = function
 
 let string_list list = List.map string list
 
-let summary opam_config =
-  let file = OpamParser.string opam_config.config
-      (Filename.concat  opam_config.opamroot "config" ) in
+let summary ~opamroot ~opam_config =
+  let file = OpamParser.string opam_config
+      (Filename.concat opamroot "config" ) in
   let summary = {
     repositories = [];
     installed_switches = [];
@@ -44,6 +44,20 @@ let summary opam_config =
     ) file.file_contents;
   summary
 
-(*
-OpamFile.SwitchSelections.read (OpamFile.make (OpamFilename.of_string string));;
+(* Unfortunately, OpamFile from opam-format cannot be used in JSOO:
+
+let switch_state switch =
+  match switch.switch_state with
+  | None -> None
+  | Some content ->
+    Some ( OpamFile.SwitchSelections.read_from_string content )
+
+let switch_config switch =
+  match switch.switch_config with
+  | None -> None
+  | Some content ->
+    Some ( OpamFile.Switch_config.read_from_string content )
+
+let opam_config config =
+  OpamFile.Config.read_from_string config.opam_config
 *)

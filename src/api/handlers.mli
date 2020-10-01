@@ -23,3 +23,23 @@ val partial_state :
   EzAPI.request ->
   Types.state_times ->
   (Types.partial_state, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val switch_packages :
+  EzAPI.request * string -> unit ->
+  (string list, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val switch_opams :
+  EzAPI.request -> Types.switch_opams_query ->
+  (Types.opam_file list, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val switch_opam :
+  EzAPI.request * string -> unit ->
+  (Types.opam_file list, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val switch_opam_extras :
+  EzAPI.request -> Types.switch_opams_query ->
+  (Types.opam_extra list, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val switch_opam_extra :
+  EzAPI.request * string -> unit ->
+  (Types.opam_extra list, exn) result RestoDirectory1.Answer.answer Lwt.t

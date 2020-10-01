@@ -9,6 +9,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
+open Types
+
 open Js_of_ocaml.Js
 
 class type error = object
@@ -68,33 +71,60 @@ let list_to_js f l =
 
 
 let state = ref None
-let get_state f =
+let get_state ?(update = false) f =
   match !state with
   | None ->
     Request.state
       (fun p ->
          let s = Types.{
-           state_times = p.partial_state_times ;
-           global_state = (match p.partial_global_state with
-               | None ->
-                 Printf.printf "no global_state\n%!";
-                 assert false
-               | Some global_state -> global_state);
-           repos_state = (match p.partial_repos_state with
-               | None ->
-                 Printf.printf "no repos_state\n%!";
-                 assert false
-               | Some repos_state -> repos_state);
-           switch_states = EzCompat.StringMap.map (function
-               | None ->
-                 Printf.printf "no switch_state\n%!";
-                 assert false
-               | Some switch_state -> switch_state) p.partial_switch_states ;
-         } in
+             state_times = p.partial_state_times ;
+             global_state = (match p.partial_global_state with
+                 | None ->
+                   Printf.printf "no global_state\n%!";
+                   assert false
+                 | Some global_state -> global_state);
+             repos_state = (match p.partial_repos_state with
+                 | None ->
+                   Printf.printf "no repos_state\n%!";
+                   assert false
+                 | Some repos_state -> repos_state);
+             switch_states = EzCompat.StringMap.map (function
+                 | None ->
+                   Printf.printf "no switch_state\n%!";
+                   assert false
+                 | Some switch_state -> switch_state) p.partial_switch_states ;
+           } in
          state := Some s;
          f s
       )
-  | Some s -> f s
+  | Some s ->
+    if update then
+      let { state_times ; _ } = s in
+      Request.state ~state_times (fun p ->
+          let s = Types.{
+              state_times = p.partial_state_times ;
+              global_state = (match p.partial_global_state with
+                  | None -> s.global_state
+                  | Some global_state -> global_state);
+              repos_state = (match p.partial_repos_state with
+                  | None -> s.repos_state
+                  | Some repos_state -> repos_state);
+              switch_states = EzCompat.StringMap.mapi (fun switch_name ->
+                  function
+                  | Some switch_state -> switch_state
+                  | None ->
+                    match
+                      StringMap.find switch_name s.switch_states
+                    with
+                    | exception _ -> assert false
+                    | switch_state -> switch_state
+                ) p.partial_switch_states ;
+            } in
+          state := Some s;
+          f s
+        )
+    else
+      f s
 
 let init path =
   let data = object%js (self)

@@ -68,6 +68,15 @@ type opam_file = {
   opam_authors : string list ;
   opam_license : string list ;
   opam_available : bool ;
+  opam_urls : string list ;
+  opam_hashes : string list ;
+}
+
+type opam_extra = {
+  opam_nv : string ; (* package.version *)
+  opam_dir : string option ;
+  opam_file : string option ; (* content of opam_file *)
+  opam_changes : string option ; (* content of changes if installed *)
 }
 
 (* API *)
@@ -75,10 +84,6 @@ type opam_file = {
 type switch_opams_query = {
   query_switch_opams_switch : string ;
   query_switch_opams_packages : string list ; (* NAME.VERSION *)
-}
-
-type switch_opams_reply = {
-  reply_switch_opams_packages : opam_file list ;
 }
 
 

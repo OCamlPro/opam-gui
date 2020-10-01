@@ -18,6 +18,8 @@ val switch_packages : string -> string list
 
 val switch_opams : string -> string list -> Types.opam_file list
 
+val switch_opam_extras : string -> string list -> Types.opam_extra list
+
 
 (* called by Handlers.to_api to update the current time *)
 val settime : unit -> unit

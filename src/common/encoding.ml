@@ -134,29 +134,31 @@ let opam_file = conv
     ( fun
       { opam_name ; opam_version ; opam_synopsis ;
         opam_description ; opam_authors ; opam_license ;
-        opam_available }
+        opam_available ; opam_urls ; opam_hashes }
       ->
         ( opam_name, opam_version, opam_synopsis,
           opam_description, opam_authors, opam_license,
-          opam_available )
+          opam_available, opam_urls, opam_hashes )
     )
     ( fun
       ( opam_name, opam_version, opam_synopsis,
         opam_description, opam_authors, opam_license,
-        opam_available )
+        opam_available, opam_urls, opam_hashes )
       ->
         { opam_name ; opam_version ; opam_synopsis ;
           opam_description ; opam_authors ; opam_license ;
-          opam_available }
+          opam_available ; opam_urls ; opam_hashes }
     )
-  @@ obj7
+  @@ obj9
   (req "name" string)
   (req "version" string)
   (req "synopsis" string)
   (req "description" string)
-  (req "authors" ( list string))
-  (req "license" ( list string))
+  (dft "authors" ( list string) [])
+  (dft "license" ( list string) [])
   (dft "available" bool true)
+  (dft "urls" ( list string) [])
+  (dft "hashes" ( list string) [])
 
 let switch_opams_query = conv
     ( fun
@@ -173,16 +175,19 @@ let switch_opams_query = conv
     (req "switch" string)
     (req "packages" ( list string ))
 
-let switch_opams_reply = conv
+let opam_extra = conv
     ( fun
-      { reply_switch_opams_packages }
+      { opam_nv ; opam_dir ; opam_file ; opam_changes }
       ->
-        ( reply_switch_opams_packages )
+        ( opam_nv, opam_dir, opam_file, opam_changes )
     )
     ( fun
-      ( reply_switch_opams_packages )
+      ( opam_nv, opam_dir, opam_file, opam_changes )
       ->
-        { reply_switch_opams_packages }
+        { opam_nv ; opam_dir ; opam_file ; opam_changes }
     )
-  @@ obj1
-  (req "opams" (list opam_file))
+  @@ obj4
+  (req "nv" string)
+  (opt "dir" string)
+  (opt "content" string)
+  (opt "changes" string)

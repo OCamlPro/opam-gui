@@ -26,6 +26,12 @@ let get0 ?post ?headers ?params ?error ?(msg="") ?(host= api_host) service f =
 let get1 ?post ?headers ?params ?error ?(msg="") ?(host= api_host) service f arg =
   EzRequest.ANY.get1 host service msg ?post ?headers ?error ?params (wrap_res ?error f) arg
 
+let post0 ?(host= api_host) ?headers ?params ?error ?(msg="") ~input service f =
+  EzRequest.ANY.post0 host service msg ?headers ?params ?error ~input (wrap_res ?error f)
+let post1 ?(host= api_host) ?headers ?params ?error ?(msg="") ~input service arg f =
+  EzRequest.ANY.post1 host service msg ?headers ?params ?error ~input arg (wrap_res ?error f)
+
+
 (*
 let info_service : (www_server_info, exn, EzAPI.no_security) EzAPI.service0 =
   EzAPI.service
@@ -47,4 +53,8 @@ let init f =
 *)
 
 let version ?error f = get0 S.version ?error f
-let global_state ?error f = get0 S.global_state ?error f
+let state ?error ?state_times f =
+  match state_times with
+  | None -> get0 S.state ?error f
+  | Some state_times ->
+    post0 S.partial_state ?error ~input:state_times f

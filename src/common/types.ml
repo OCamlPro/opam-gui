@@ -30,7 +30,6 @@ type switch_state = {
   switch_dirname : string ;
   switch_state : string option ;
   switch_config : string option ;
-  switch_time : int64 ;
 
   switch_base : string list ;
   switch_roots : string list ;
@@ -39,24 +38,48 @@ type switch_state = {
   (* switch_repos *)
 }
 
-type opam_config = {
-  config_content : string ;
-  config_current_switch : string option ;
-}
-
 type global_state = {
-  mutable opamroot : string ; (* directory of opam *)
-  mutable opam_config : opam_config ;   (* config of opam *)
-  mutable repos_list : string list ;
-  mutable switches : switch_state StringMap.t ;
+  global_opamroot : string ; (* directory of opam *)
+  global_configfile : string ;   (* config of opam *)
+  global_repos : string list ;   (* list of repositories *)
+  global_current_switch : string option ; (* current switch *)
 }
 
+type state_times = {
+  mutable global_mtime : int64 ;
+  mutable repos_mtime : int64 ;
+  mutable switches_mtime : int64 StringMap.t ;
+}
+
+type repos_state = unit
+
+type partial_state = {
+  partial_state_times : state_times ;
+  partial_global_state : global_state option ;
+  partial_repos_state : repos_state option ;
+  partial_switch_states : switch_state option StringMap.t ;
+}
 
 (******************* WITHOUT ENCODINGS ***************************)
+
+type state = {
+  state_times : state_times ;
+  global_state : global_state ;
+  repos_state : repos_state ;
+  switch_states : switch_state StringMap.t ;
+}
 
 (* Use OpamUtils.summary opam_config to generate: *)
 type opam_config_summary = {
   mutable repositories : string list ;
   mutable installed_switches : string list ;
   mutable switch : string option ;
+}
+
+
+
+let prehistoric_times () = {
+  global_mtime = 0L ;
+  repos_mtime = 0L;
+  switches_mtime = StringMap.empty ;
 }

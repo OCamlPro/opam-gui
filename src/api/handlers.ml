@@ -19,5 +19,8 @@ let version _params () = to_api (
     Db.get_version () |> fun v_db_version ->
     Lwt.return (Ok { v_db = "none"; v_db_version }))
 
-let global_state _req () =
-  to_api @@ (Lwt.return (Ok ( Opam.load_state () )))
+let state _req () =
+  to_api @@ (Lwt.return (Ok ( Opam.get_partial_state () )))
+
+let partial_state _req state_times =
+  to_api @@ (Lwt.return (Ok ( Opam.get_partial_state ~state_times () )))

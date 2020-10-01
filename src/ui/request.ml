@@ -31,30 +31,20 @@ let post0 ?(host= api_host) ?headers ?params ?error ?(msg="") ~input service f =
 let post1 ?(host= api_host) ?headers ?params ?error ?(msg="") ~input service arg f =
   EzRequest.ANY.post1 host service msg ?headers ?params ?error ~input arg (wrap_res ?error f)
 
-
-(*
-let info_service : (www_server_info, exn, EzAPI.no_security) EzAPI.service0 =
-  EzAPI.service
-    ~output:Encoding.info_encoding
-    EzAPI.Path.(root // "info.json" )
-
-
-let init f =
-  get0 ~host:(Common.host ()) info_service
-    ~error:(fun code content ->
-        let s = match content with
-          | None -> "network error"
-          | Some content -> "network error: " ^ string_of_int code ^ " -> " ^ content in
-        Common.logs s)
-    (fun ({www_apis; _} as info) ->
-       let api = List.nth www_apis (Random.int @@ List.length www_apis) in
-       host := EzAPI.TYPES.BASE api;
-       f info)
-*)
-
 let version ?error f = get0 S.version ?error f
 let state ?error ?state_times f =
   match state_times with
   | None -> get0 S.state ?error f
   | Some state_times ->
     post0 S.partial_state ?error ~input:state_times f
+
+let switch_packages ?error ~switch f =
+  post0 S.switch_packages ?error ~input:switch f
+
+let switch_opams ?error ~switch ~packages f =
+  post0 S.switch_opams ?error
+    ~input:{
+      query_switch_opams_switch = switch ;
+      query_switch_opams_packages = packages ;
+    }
+    (fun { reply_switch_opams_packages } -> f reply_switch_opams_packages)

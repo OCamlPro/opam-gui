@@ -13,3 +13,11 @@ val opamroot_dir : string
 
 val get_partial_state :
   ?state_times:Types.state_times -> unit -> Types.partial_state
+
+val switch_packages : string -> string list
+
+val switch_opams : string -> string list -> Types.opam_file list
+
+
+(* called by Handlers.to_api to update the current time *)
+val settime : unit -> unit

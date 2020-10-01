@@ -13,14 +13,27 @@ open Lwt.Infix
 open Types
 open EzFile.OP
 
-let to_api p = Lwt.bind p EzAPIServerUtils.return
+let to_api p =
+  Opam.settime ();
+  EzAPIServerUtils.return (Ok (p ()))
 
-let version _params () = to_api (
-    Db.get_version () |> fun v_db_version ->
-    Lwt.return (Ok { v_db = "none"; v_db_version }))
+let version _params () =
+  to_api (fun () ->
+      Db.get_version () |> fun v_db_version ->
+      { v_db = "none"; v_db_version })
 
 let state _req () =
-  to_api @@ (Lwt.return (Ok ( Opam.get_partial_state () )))
+  to_api @@ (fun () -> Opam.get_partial_state () )
 
 let partial_state _req state_times =
-  to_api @@ (Lwt.return (Ok ( Opam.get_partial_state ~state_times () )))
+  to_api @@ (fun () -> Opam.get_partial_state ~state_times () )
+
+let switch_packages _req switch =
+  to_api @@ (fun () ->
+      Opam.switch_packages switch
+    )
+
+let switch_opams _req switch packages =
+  to_api @@ (fun () ->
+      Opam.switch_opams switch packages
+    )

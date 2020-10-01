@@ -28,11 +28,11 @@ type version = {
 type switch_state = {
   switch_name : string ;
   switch_dirname : string ;
-  switch_state : string option ;
-  switch_config : string option ;
+  switch_state : string option ; (* content of file *)
+  switch_config : string option ; (* content of file *)
 
-  switch_base : string list ;
-  switch_roots : string list ;
+  switch_base : string list ; (* list of initial packages: compiler *)
+  switch_roots : string list ; (* list of explicitely installed packages *)
   switch_installed : string list ;
   switch_pinned : string list ;
   (* switch_repos *)
@@ -59,6 +59,30 @@ type partial_state = {
   partial_repos_state : repos_state option ;
   partial_switch_states : switch_state option StringMap.t ;
 }
+
+type opam_file = {
+  opam_name : string ;
+  opam_version : string ;
+  opam_synopsis : string ;
+  opam_description : string ;
+  opam_authors : string list ;
+  opam_license : string list ;
+  opam_available : bool ;
+}
+
+(* API *)
+
+type switch_opams_query = {
+  query_switch_opams_switch : string ;
+  query_switch_opams_packages : string list ; (* NAME.VERSION *)
+}
+
+type switch_opams_reply = {
+  reply_switch_opams_packages : opam_file list ;
+}
+
+
+
 
 (******************* WITHOUT ENCODINGS ***************************)
 

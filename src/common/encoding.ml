@@ -129,3 +129,60 @@ let partial_state = conv
     (opt "global" global_state)
     (opt "repos" repos_state)
     (req "switches" (list (tup2 string (option switch_state))))
+
+let opam_file = conv
+    ( fun
+      { opam_name ; opam_version ; opam_synopsis ;
+        opam_description ; opam_authors ; opam_license ;
+        opam_available }
+      ->
+        ( opam_name, opam_version, opam_synopsis,
+          opam_description, opam_authors, opam_license,
+          opam_available )
+    )
+    ( fun
+      ( opam_name, opam_version, opam_synopsis,
+        opam_description, opam_authors, opam_license,
+        opam_available )
+      ->
+        { opam_name ; opam_version ; opam_synopsis ;
+          opam_description ; opam_authors ; opam_license ;
+          opam_available }
+    )
+  @@ obj7
+  (req "name" string)
+  (req "version" string)
+  (req "synopsis" string)
+  (req "description" string)
+  (req "authors" ( list string))
+  (req "license" ( list string))
+  (dft "available" bool true)
+
+let switch_opams_query = conv
+    ( fun
+      { query_switch_opams_switch ; query_switch_opams_packages }
+      ->
+        ( query_switch_opams_switch, query_switch_opams_packages )
+    )
+    ( fun
+      ( query_switch_opams_switch, query_switch_opams_packages )
+      ->
+        { query_switch_opams_switch ; query_switch_opams_packages }
+    )
+  @@ obj2
+    (req "switch" string)
+    (req "packages" ( list string ))
+
+let switch_opams_reply = conv
+    ( fun
+      { reply_switch_opams_packages }
+      ->
+        ( reply_switch_opams_packages )
+    )
+    ( fun
+      ( reply_switch_opams_packages )
+      ->
+        { reply_switch_opams_packages }
+    )
+  @@ obj1
+  (req "opams" (list opam_file))

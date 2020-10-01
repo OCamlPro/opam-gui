@@ -12,6 +12,16 @@
 val version :
   ?error:EzRequest.error_handler -> (Types.version -> unit) -> unit
 
+(* query an update of the state *)
 val state :
   ?error:EzRequest.error_handler ->
   ?state_times:Types.state_times -> (Types.partial_state -> unit) -> unit
+
+val switch_packages :
+  ?error:EzRequest.error_handler ->
+  switch:string -> (string list -> unit) -> unit
+
+val switch_opams :
+  ?error:EzRequest.error_handler ->
+  switch:string -> packages:string list ->
+  (Types.opam_file list -> unit) -> unit

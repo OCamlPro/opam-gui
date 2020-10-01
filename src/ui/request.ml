@@ -58,3 +58,14 @@ let state ?error ?state_times f =
   | None -> get0 S.state ?error f
   | Some state_times ->
     post0 S.partial_state ?error ~input:state_times f
+
+let switch_packages ?error ~switch f =
+  post0 S.switch_packages ?error ~input:switch f
+
+let switch_opams ?error ~switch ~packages f =
+  post0 S.switch_opams ?error
+    ~input:{
+      query_switch_opams_switch = switch ;
+      query_switch_opams_packages = packages ;
+    }
+    (fun { reply_switch_opams_packages } -> f reply_switch_opams_packages)

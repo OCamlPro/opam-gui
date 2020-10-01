@@ -50,7 +50,11 @@ let rec mtimes filenames =
   | filename :: filenames ->
     max (mtime filename) (mtimes filenames)
 
+let current_time = ref ( Unix.gettimeofday ())
+let settime () = current_time := Unix.gettimeofday ()
+
 let state = ref None
+let last_state_update = ref 0.
 
 let read_state () =
   match !state with
@@ -91,6 +95,7 @@ let read_state () =
     let switches = StringMap.of_list switches in
     let s = { gt ; rt ; switches } in
     state := Some s;
+    last_state_update := !current_time;
     s
 
   | Some s ->
@@ -172,7 +177,18 @@ let read_state () =
     let switches = StringMap.of_list switches in
     s.switches <- switches;
     times.switches_mtime <- !switches_mtime;
+    last_state_update := !current_time;
     s
+
+(* Use this function to only reload the state after 5 seconds *)
+let get_state ?(force=false) () =
+  match !state with
+  | None -> read_state ()
+  | Some state ->
+    if force || !current_time > !last_state_update +. 5. then
+      read_state ()
+    else
+      state
 
 let get_partial_state ?( state_times = prehistoric_times () ) () =
   let { gt ; rt ; switches } = read_state () in
@@ -272,3 +288,45 @@ let get_partial_state ?( state_times = prehistoric_times () ) () =
     partial_repos_state ;
     partial_switch_states ;
   }
+
+let switch_packages switch =
+  let { gt ; rt ; switches } = get_state () in
+  let switch_state = StringMap.find switch switches in
+  let packages = ref [] in
+  OpamPackage.Set.iter (fun p ->
+      packages := OpamPackage.to_string p :: !packages)
+    switch_state.packages;
+  List.rev !packages
+
+let switch_opams switch packages =
+  let { gt ; rt ; switches } = get_state () in
+  let switch_state = StringMap.find switch switches in
+  let opams = ref [] in
+  List.iter (fun nv ->
+      let p = OpamPackage.of_string nv in
+      match OpamPackage.Map.find p switch_state.opams with
+      | exception Not_found ->
+        Printf.eprintf
+          "Warning: could not find OPAM for %s in switch %s\n%!"
+          nv switch
+      | opam ->
+        let opam_synopsis = match OpamFile.OPAM.synopsis opam with
+          | None -> "" | Some s -> s
+        in
+        let opam_description = match OpamFile.OPAM.descr_body opam with
+          | None -> "" | Some s -> s
+        in
+        let opam_authors = OpamFile.OPAM.author opam in
+        let opam_license = OpamFile.OPAM.license opam in
+        let opam_name, opam_version = EzString.cut_at nv '.' in
+        let opam = {
+          opam_name ;
+          opam_version ;
+          opam_synopsis ;
+          opam_description ;
+          opam_license ;
+          opam_authors ;
+        } in
+        opams := opam :: !opams
+    ) packages;
+  !opams

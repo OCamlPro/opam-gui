@@ -60,6 +60,29 @@ type partial_state = {
   partial_switch_states : switch_state option StringMap.t ;
 }
 
+type opam_file = {
+  opam_name : string ;
+  opam_version : string ;
+  opam_synopsis : string ;
+  opam_description : string ;
+  opam_authors : string list ;
+  opam_license : string list ;
+}
+
+(* API *)
+
+type switch_opams_query = {
+  query_switch_opams_switch : string ;
+  query_switch_opams_packages : string list ; (* NAME.VERSION *)
+}
+
+type switch_opams_reply = {
+  reply_switch_opams_packages : opam_file list ;
+}
+
+
+
+
 (******************* WITHOUT ENCODINGS ***************************)
 
 type state = {

@@ -56,6 +56,18 @@ let settime () = current_time := Unix.gettimeofday ()
 let state = ref None
 let last_state_update = ref 0.
 
+
+let switch_dir ~gt switch =
+  let switch_name = OpamSwitch.to_string switch in
+  if Filename.is_relative switch_name then
+    let opamroot = OpamFilename.Dir.to_string gt.root in
+    opamroot // switch_name
+  else
+    switch_name // "_opam"
+
+let switch_meta ~gt switch =
+  ( switch_dir ~gt switch ) // ".opam-switch"
+
 let read_state () =
   match !state with
   | None ->
@@ -74,16 +86,11 @@ let read_state () =
       let switches = OpamGlobalState.switches gt in
       List.map  (fun switch ->
           let switch_name = OpamSwitch.to_string switch in
-          let switch_dir =
-            if Filename.is_relative switch_name then
-              opamroot // switch_name
-            else
-              switch_name // "_opam"
-          in
+          let switch_meta = switch_meta ~gt switch in
           let switch_state_filename =
-            switch_dir // ".opam-switch" // "switch-state" in
+            switch_meta // "switch-state" in
           let switch_config_filename =
-            switch_dir // ".opam-switch" // "switch-config" in
+            switch_meta // "switch-config" in
           let switch_mtime = mtimes
               [ switch_state_filename ; switch_config_filename ] in
           times.switches_mtime <- StringMap.add switch_name switch_mtime
@@ -189,6 +196,55 @@ let get_state ?(force=false) () =
     else
       state
 
+let convert_switch_state gt st =
+  let switch = st.switch in
+  let switch_name = OpamSwitch.to_string switch in
+  let global_opamroot = OpamFilename.Dir.to_string gt.root in
+  let switch_dirname =
+    if Filename.is_relative switch_name then
+      global_opamroot // switch_name
+    else
+      switch_name // "_opam"
+  in
+  let switch_state_filename =
+    switch_dirname // ".opam-switch" // "switch-state"
+  in
+  let switch_config_filename =
+    switch_dirname // ".opam-switch" // "switch-config"
+  in
+  let switch_state = match EzFile.read_file switch_state_filename with
+    | exception _ -> None
+    | content -> Some content
+  in
+  let switch_config = match EzFile.read_file switch_config_filename with
+    | exception _ -> None
+    | content -> Some content
+  in
+
+  let switch_base = OpamPackage.Set.elements st.compiler_packages
+                    |> List.map OpamPackage.to_string in
+  let switch_roots = OpamPackage.Set.elements st.installed_roots
+                     |> List.map OpamPackage.to_string in
+  let switch_installed = OpamPackage.Set.elements st.installed
+                         |> List.map OpamPackage.to_string in
+  let switch_pinned = OpamPackage.Set.elements st.pinned
+                      |> List.map OpamPackage.to_string in
+  {
+    switch_name ;
+    switch_dirname ;
+    switch_state ;
+    switch_config ;
+    switch_base ;
+    switch_roots ;
+    switch_installed ;
+    switch_pinned ;
+  }
+
+let switch switch =
+  let { gt ; rt ; switches } = get_state () in
+  let switch_state = StringMap.find switch switches in
+  convert_switch_state gt switch_state
+
 let get_partial_state ?( state_times = prehistoric_times () ) () =
   let { gt ; rt ; switches } = read_state () in
 
@@ -225,6 +281,7 @@ let get_partial_state ?( state_times = prehistoric_times () ) () =
   in
   let partial_switch_states =
     StringMap.map (fun st ->
+
         let switch = st.switch in
         let switch_name = OpamSwitch.to_string switch in
         let old_mtime =
@@ -235,48 +292,7 @@ let get_partial_state ?( state_times = prehistoric_times () ) () =
         let new_mtime =
           StringMap.find switch_name partial_state_times.switches_mtime in
         if new_mtime > old_mtime then
-          let switch_dirname =
-            if Filename.is_relative switch_name then
-              global_opamroot // switch_name
-            else
-              switch_name // "_opam"
-          in
-          let switch_state_filename =
-            switch_dirname // ".opam-switch" // "switch-state"
-          in
-          let switch_config_filename =
-            switch_dirname // ".opam-switch" // "switch-config"
-          in
-          let switch_state = match EzFile.read_file switch_state_filename with
-            | exception _ -> None
-            | content -> Some content
-          in
-          let switch_config = match EzFile.read_file switch_config_filename with
-            | exception _ -> None
-            | content -> Some content
-          in
-
-          let switch_base = OpamPackage.Set.elements st.compiler_packages
-                            |> List.map OpamPackage.to_string in
-          let switch_roots = OpamPackage.Set.elements st.installed_roots
-                             |> List.map OpamPackage.to_string in
-          let switch_installed = OpamPackage.Set.elements st.installed
-                                 |> List.map OpamPackage.to_string in
-          let switch_pinned = OpamPackage.Set.elements st.pinned
-                              |> List.map OpamPackage.to_string in
-          let switch_state =
-            {
-              switch_name ;
-              switch_dirname ;
-              switch_state ;
-              switch_config ;
-              switch_base ;
-              switch_roots ;
-              switch_installed ;
-              switch_pinned ;
-            }
-          in
-          Some switch_state
+          Some ( convert_switch_state gt st )
         else
           None
       ) switches
@@ -296,6 +312,15 @@ let switch_packages switch =
       packages := OpamPackage.to_string p :: !packages)
     switch_state.packages;
   List.rev !packages
+
+let set_of_formula formula =
+  let set = ref StringSet.empty in
+  OpamFormula.iter (fun (name, _formula) ->
+      let name = OpamPackage.Name.to_string name in
+      set := StringSet.add name !set) formula;
+  { dep_set = !set ;
+    dep_formula = OpamFilter.string_of_filtered_formula formula ;
+  }
 
 let switch_opams switch packages =
   let { gt ; rt ; switches } = get_state () in
@@ -320,6 +345,25 @@ let switch_opams switch packages =
         let opam_name, opam_version = EzString.cut_at nv '.' in
         let opam_available =
           OpamPackage.Set.mem p (Lazy.force switch_state.available_packages) in
+        let opam_urls, opam_hashes =
+          match OpamFile.OPAM.url opam with
+          | None -> [], []
+          | Some url ->
+            (
+              ( OpamFile.URL.url url ::
+                OpamFile.URL.mirrors url ) |> List.map OpamUrl.to_string ),
+            OpamFile.URL.checksum url |> List.map OpamHash.to_string
+        in
+
+        let opam_depends =
+          let depends = OpamFile.OPAM.depends opam in
+          set_of_formula depends
+        in
+
+        let opam_depopts =
+          let depends = OpamFile.OPAM.depopts opam in
+          set_of_formula depends
+        in
         let opam = {
           opam_name ;
           opam_version ;
@@ -328,7 +372,75 @@ let switch_opams switch packages =
           opam_license ;
           opam_authors ;
           opam_available ;
+          opam_urls ;
+          opam_hashes ;
+          opam_depends ;
+          opam_depopts ;
         } in
         opams := opam :: !opams
     ) packages;
   !opams
+
+let switch_opam_extras switch packages =
+  let { gt ; rt ; switches } = get_state () in
+  let switch_state = StringMap.find switch switches in
+  List.map (fun opam_nv ->
+      let p = OpamPackage.of_string opam_nv in
+      let opam = OpamPackage.Map.find p switch_state.opams in
+
+      let opam_dir = OpamFile.OPAM.metadata_dir opam
+      (* next version:
+         let repos_root = OpamRepositoryState.get_repo rt in
+         OpamFile.OPAM.get_metadata_dir
+         ~repos_root opam
+      *)
+      in
+      let opam_dir, opam_file = match opam_dir with
+        | None -> None, None
+        | Some opam_dir ->
+          let opam_dir = OpamFilename.Dir.to_string opam_dir in
+          let opam_file = EzFile.read_file ( opam_dir // "opam" ) in
+          Some opam_dir, Some opam_file
+      in
+      let (n,v) = EzString.cut_at opam_nv '.' in
+      let switch_meta = switch_meta ~gt switch_state.switch in
+      let opam_changes =
+        let filename = switch_meta // "install" // ( n ^ ".changes") in
+        if Sys.file_exists filename then
+          let changes = OpamFile.Changes.read
+              (OpamFile.make
+                 (OpamFilename.of_string filename)) in
+          let opam_changes = ref StringMap.empty in
+          OpamStd.String.Map.iter (fun file change ->
+              let change = match change with
+                | OpamDirTrack.Added digest ->
+                  let s = OpamDirTrack.string_of_digest digest in
+                  begin
+                    match s.[0] with
+                    | 'D' -> AddDir
+                    | 'L' ->
+                      let _, link = EzString.cut_at s ':' in
+                      AddLink link
+                    | 'F' ->
+                      let _, s = EzString.cut_at s 'S' in
+                      let size, _ = EzString.cut_at s 'T' in
+                      let size = Int64.of_string size in
+                      AddFile size
+                    | _ -> ModifyFile
+                  end
+                | Removed -> RemoveFile
+                | _ -> ModifyFile
+              in
+              opam_changes := StringMap.add file change !opam_changes
+            ) changes ;
+          Some ( !opam_changes )
+        else
+          None
+      in
+      {
+        opam_nv ;
+        opam_changes ;
+        opam_dir ;
+        opam_file ;
+      }
+    ) packages

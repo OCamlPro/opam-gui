@@ -28,12 +28,36 @@ let state _req () =
 let partial_state _req state_times =
   to_api @@ (fun () -> Opam.get_partial_state ~state_times () )
 
-let switch_packages _req switch =
+let switch_packages (_req, switch) () =
   to_api @@ (fun () ->
       Opam.switch_packages switch
     )
 
-let switch_opams _req switch packages =
+let switch_opams _req q =
   to_api @@ (fun () ->
-      Opam.switch_opams switch packages
+      Opam.switch_opams
+        q.query_switch_opams_switch
+        q.query_switch_opams_packages
     )
+
+let switch_opam (_req, switch_nv) q =
+  let switch, nv = EzString.cut_at switch_nv ',' in
+  to_api @@ (fun () ->
+      Opam.switch_opams switch [nv]
+    )
+
+let switch_opam_extras _req q =
+  to_api @@ (fun () ->
+      Opam.switch_opam_extras
+        q.query_switch_opams_switch
+        q.query_switch_opams_packages
+    )
+
+let switch_opam_extra (_req, switch_nv) q =
+  let switch, nv = EzString.cut_at switch_nv ',' in
+  to_api @@ (fun () ->
+      Opam.switch_opam_extras switch [nv]
+    )
+
+let switch (_req, switch) () =
+  to_api @@ (fun () -> Opam.switch switch)

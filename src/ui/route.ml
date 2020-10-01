@@ -14,35 +14,6 @@ open Js_of_ocaml
 open Js
 open Types
 
-let state = ref None
-let get_state f =
-  match !state with
-  | None ->
-    Request.state
-      (fun p ->
-         let s = {
-           state_times = p.partial_state_times ;
-           global_state = (match p.partial_global_state with
-               | None ->
-                 Printf.printf "no global_state\n%!";
-                 assert false
-               | Some global_state -> global_state);
-           repos_state = (match p.partial_repos_state with
-               | None ->
-                 Printf.printf "no repos_state\n%!";
-                 assert false
-               | Some repos_state -> repos_state);
-           switch_states = StringMap.map (function
-               | None ->
-                 Printf.printf "no switch_state\n%!";
-                 assert false
-               | Some switch_state -> switch_state) p.partial_switch_states ;
-         } in
-         state := Some s;
-         f s
-      )
-  | Some s -> f s
-
 let get_app ?app () = match app with
   | None -> V.app ()
   | Some app -> app
@@ -54,24 +25,7 @@ let route ?app path =
   match String.split_on_char '/' path with
   | [ path ] -> begin match path with
       | "" ->
-        get_state (fun ( gs : Types.state ) ->
-            let s = OpamUtils.opam_config_summary
-                gs in
-            let switches =
-              List.rev @@ List.map (fun sw ->
-                  let current =
-                    match s.switch with
-                    | None -> false
-                    | Some sw' -> String.equal sw sw'
-                  in
-                  (sw, current)
-                ) s.installed_switches
-            in
-
-            app##.switches := V.list_to_js V.switch_to_js switches
-          );
-
-        app##.packages := app##.packages;
+          ()
 
       | "db" ->
         Request.version (fun {v_db; v_db_version} ->

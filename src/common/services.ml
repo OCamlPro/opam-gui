@@ -50,6 +50,18 @@ let arg_switch_nv =
   EzAPI.arg_string "switch_nv" "SWITCH,NAME.VERSION"
 
 (* To test from curl:
+curl http://127.0.0.1:9989/switch/SWITCH
+*)
+let switch :
+  (string, switch_state, exn, no_security)
+    service1 =
+  service
+    ~section:section_main
+    ~name:"switch"
+    ~output:switch_state
+    Path.(root // "switch" /: arg_switch)
+
+(* To test from curl:
 curl http://127.0.0.1:9989/switch_packages
 *)
 let switch_packages :

@@ -58,3 +58,6 @@ let switch_opam_extra (_req, switch_nv) q =
   to_api @@ (fun () ->
       Opam.switch_opam_extras switch [nv]
     )
+
+let switch (_req, switch) () =
+  to_api @@ (fun () -> Opam.switch switch)

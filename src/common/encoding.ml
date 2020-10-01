@@ -130,26 +130,48 @@ let partial_state = conv
     (opt "repos" repos_state)
     (req "switches" (list (tup2 string (option switch_state))))
 
+let deps = conv
+    ( fun
+      { dep_set ; dep_formula }
+      ->
+        let dep_set = StringSet.to_list dep_set in
+        ( dep_set, dep_formula )
+    )
+    ( fun
+      ( dep_set, dep_formula )
+      ->
+        let dep_set = StringSet.of_list dep_set in
+        { dep_set ; dep_formula }
+    )
+  @@ obj2
+    ( dft "dep_set" ( list string ) [])
+    ( req "formula" string )
+
+
 let opam_file = conv
     ( fun
       { opam_name ; opam_version ; opam_synopsis ;
         opam_description ; opam_authors ; opam_license ;
-        opam_available ; opam_urls ; opam_hashes }
+        opam_available ; opam_urls ; opam_hashes ;
+        opam_depends ; opam_depopts }
       ->
         ( opam_name, opam_version, opam_synopsis,
           opam_description, opam_authors, opam_license,
-          opam_available, opam_urls, opam_hashes )
+          opam_available, opam_urls, opam_hashes,
+          opam_depends, opam_depopts )
     )
     ( fun
       ( opam_name, opam_version, opam_synopsis,
         opam_description, opam_authors, opam_license,
-        opam_available, opam_urls, opam_hashes )
+        opam_available, opam_urls, opam_hashes,
+          opam_depends, opam_depopts )
       ->
         { opam_name ; opam_version ; opam_synopsis ;
           opam_description ; opam_authors ; opam_license ;
-          opam_available ; opam_urls ; opam_hashes }
+          opam_available ; opam_urls ; opam_hashes ;
+        opam_depends ; opam_depopts }
     )
-  @@ obj9
+  @@ EzEncoding.obj11
   (req "name" string)
   (req "version" string)
   (req "synopsis" string)
@@ -159,6 +181,8 @@ let opam_file = conv
   (dft "available" bool true)
   (dft "urls" ( list string) [])
   (dft "hashes" ( list string) [])
+  (req "depends" deps)
+  (req "depopts" deps)
 
 let switch_opams_query = conv
     ( fun

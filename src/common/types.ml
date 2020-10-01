@@ -60,6 +60,11 @@ type partial_state = {
   partial_switch_states : switch_state option StringMap.t ;
 }
 
+type deps = {
+  dep_set : StringSet.t;
+  dep_formula : string ;
+}
+
 type opam_file = {
   opam_name : string ;
   opam_version : string ;
@@ -70,6 +75,8 @@ type opam_file = {
   opam_available : bool ;
   opam_urls : string list ;
   opam_hashes : string list ;
+  opam_depends : deps ;
+  opam_depopts : deps ;
 }
 
 type file_change =

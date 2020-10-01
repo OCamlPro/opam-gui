@@ -57,12 +57,24 @@
             <!-- Top line -->
             <b-row>
               <b-col>
-                <span>List of your switches</span>
-                <b-table sticky-header small hover
-                         selectable no-select-on-click :items="switches"
+                <b-table sticky-header small hover outlined
+                         selectable no-select-on-click
+                         :busy.sync="switches_busy"
+                         :items="switches_provider"
                          :fields="[{ key:'current', label:'',
                                      thStyle:'width: max-content'},
-                                   { key:'name', thStyle:'width:100%'}]">
+                                   { key:'name',
+                                     label:'List of your switches',
+                                     thStyle:'width:50%'},
+                                   { key:'path', label:'',
+                                     thStyle:'width:500%'}]">
+
+                  <template v-slot:table-busy>
+                    <div class="text-center text-danger my-2">
+                      <b-spinner class="align-middle"></b-spinner>
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
 
                   <template v-slot:cell(current)="row">
 
@@ -85,13 +97,23 @@
             <!-- Bottom line -->
             <b-row>
               <b-col>
-                <span>Packages for the current switch</span>
-                <b-table sticky-header small hover :items="packages"
+                <b-table sticky-header small hover outlined
+                         :busy.sync="packages_busy"
+                         :items="packages_provider"
                          :fields="[{ key:'installed', label:'',
                                      thStyle:'width: max-content'},
-                                   { key:'name', thStyle:'width:100%'}]">
+                                   { key:'name',
+                                     label:'Packages for the current switch',
+                                     thStyle:'width:100%'}]">
 
                   <!-- <template v-slot:head(installed)="row">&nbsp;</template> -->
+
+                  <template v-slot:table-busy>
+                    <div class="text-center text-danger my-2">
+                      <b-spinner class="align-middle"></b-spinner>
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
 
                   <template v-slot:cell(installed)="row">
                     <b-form-checkbox v-model="row.value">
@@ -106,6 +128,7 @@
           <!-- Right column -->
           <b-col cols="4">
             <span>Commands</span>
+            <button v-on:click="some_action">Test</button>
           </b-col>
         </b-row>
       </b-container>

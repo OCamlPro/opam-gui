@@ -126,11 +126,10 @@ let read_state () =
       if times.repos_mtime < repos_mtime then
         let rt = OpamRepositoryState.load `Lock_none gt in
         s.rt <- rt ;
-        s.switches <- StringMap.map (fun switch ->
-            { switch with
-              switch_repos = rt;
-            }) s.switches ;
         times.repos_mtime <- repos_mtime ;
+        (* invalidate all switches *)
+        s.switches <- StringMap.empty;
+        times.switches_mtime <- StringMap.empty;
         rt
       else
         s.rt
@@ -319,6 +318,8 @@ let switch_opams switch packages =
         let opam_authors = OpamFile.OPAM.author opam in
         let opam_license = OpamFile.OPAM.license opam in
         let opam_name, opam_version = EzString.cut_at nv '.' in
+        let opam_available =
+          OpamPackage.Set.mem p (Lazy.force switch_state.available_packages) in
         let opam = {
           opam_name ;
           opam_version ;
@@ -326,6 +327,7 @@ let switch_opams switch packages =
           opam_description ;
           opam_license ;
           opam_authors ;
+          opam_available ;
         } in
         opams := opam :: !opams
     ) packages;

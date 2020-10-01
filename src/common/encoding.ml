@@ -133,25 +133,30 @@ let partial_state = conv
 let opam_file = conv
     ( fun
       { opam_name ; opam_version ; opam_synopsis ;
-        opam_description ; opam_authors ; opam_license }
+        opam_description ; opam_authors ; opam_license ;
+        opam_available }
       ->
         ( opam_name, opam_version, opam_synopsis,
-          opam_description, opam_authors, opam_license )
+          opam_description, opam_authors, opam_license,
+          opam_available )
     )
     ( fun
       ( opam_name, opam_version, opam_synopsis,
-        opam_description, opam_authors, opam_license )
+        opam_description, opam_authors, opam_license,
+        opam_available )
       ->
         { opam_name ; opam_version ; opam_synopsis ;
-          opam_description ; opam_authors ; opam_license }
+          opam_description ; opam_authors ; opam_license ;
+          opam_available }
     )
-  @@ obj6
+  @@ obj7
   (req "name" string)
   (req "version" string)
   (req "synopsis" string)
   (req "description" string)
   (req "authors" ( list string))
   (req "license" ( list string))
+  (dft "available" bool true)
 
 let switch_opams_query = conv
     ( fun

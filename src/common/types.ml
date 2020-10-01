@@ -28,11 +28,11 @@ type version = {
 type switch_state = {
   switch_name : string ;
   switch_dirname : string ;
-  switch_state : string option ;
-  switch_config : string option ;
+  switch_state : string option ; (* content of file *)
+  switch_config : string option ; (* content of file *)
 
-  switch_base : string list ;
-  switch_roots : string list ;
+  switch_base : string list ; (* list of initial packages: compiler *)
+  switch_roots : string list ; (* list of explicitely installed packages *)
   switch_installed : string list ;
   switch_pinned : string list ;
   (* switch_repos *)
@@ -67,6 +67,7 @@ type opam_file = {
   opam_description : string ;
   opam_authors : string list ;
   opam_license : string list ;
+  opam_available : bool ;
 }
 
 (* API *)

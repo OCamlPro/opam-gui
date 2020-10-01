@@ -18,6 +18,7 @@ depends: [
   "opam-format"
   "opam-state"
   "ocplib_stuff"
+  "ezjs_min"
 ]
 build: [
   [ make "config" ]

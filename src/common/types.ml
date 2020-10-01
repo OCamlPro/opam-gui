@@ -72,11 +72,18 @@ type opam_file = {
   opam_hashes : string list ;
 }
 
+type file_change =
+  | AddDir
+  | AddFile of int64
+  | RemoveFile
+  | ModifyFile
+  | AddLink of string
+
 type opam_extra = {
   opam_nv : string ; (* package.version *)
   opam_dir : string option ;
   opam_file : string option ; (* content of opam_file *)
-  opam_changes : string option ; (* content of changes if installed *)
+  opam_changes : file_change StringMap.t option ;
 }
 
 (* API *)

@@ -377,7 +377,33 @@ let switch_opam_extras switch packages =
       let opam_changes =
         let filename = switch_meta // "install" // ( n ^ ".changes") in
         if Sys.file_exists filename then
-          Some ( EzFile.read_file filename )
+          let changes = OpamFile.Changes.read
+              (OpamFile.make
+                 (OpamFilename.of_string filename)) in
+          let opam_changes = ref StringMap.empty in
+          OpamStd.String.Map.iter (fun file change ->
+              let change = match change with
+                | OpamDirTrack.Added digest ->
+                  let s = OpamDirTrack.string_of_digest digest in
+                  begin
+                    match s.[0] with
+                    | 'D' -> AddDir
+                    | 'L' ->
+                      let _, link = EzString.cut_at s ':' in
+                      AddLink link
+                    | 'F' ->
+                      let _, s = EzString.cut_at s 'S' in
+                      let size, _ = EzString.cut_at s 'T' in
+                      let size = Int64.of_string size in
+                      AddFile size
+                    | _ -> ModifyFile
+                  end
+                | Removed -> RemoveFile
+                | _ -> ModifyFile
+              in
+              opam_changes := StringMap.add file change !opam_changes
+            ) changes ;
+          Some ( !opam_changes )
         else
           None
       in

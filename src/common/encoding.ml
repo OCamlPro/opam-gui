@@ -175,19 +175,49 @@ let switch_opams_query = conv
     (req "switch" string)
     (req "packages" ( list string ))
 
+let file_change = conv
+    ( function
+      | AddFile size -> ("add", Some size)
+      | AddDir -> ("dir", None)
+      | RemoveFile -> "del", None
+      | ModifyFile -> "chg", None
+      | AddLink s -> s, None
+    )
+    ( function
+      | "add", Some size -> AddFile size
+      | "dir", None -> AddDir
+      | "del", None -> RemoveFile
+      | "chg", None -> ModifyFile
+      | link, None -> AddLink link
+      | _, Some _ -> assert false
+    )
+  @@ obj2
+    (req "op" string)
+    (opt "size" int64)
+
 let opam_extra = conv
     ( fun
       { opam_nv ; opam_dir ; opam_file ; opam_changes }
       ->
+        let opam_changes =
+          match opam_changes with
+          | None -> None
+          | Some opam_changes ->
+            Some ( StringMap.bindings opam_changes ) in
         ( opam_nv, opam_dir, opam_file, opam_changes )
     )
     ( fun
       ( opam_nv, opam_dir, opam_file, opam_changes )
       ->
+        let opam_changes =
+          match opam_changes with
+          | None -> None
+          | Some opam_changes ->
+            Some ( StringMap.of_list opam_changes ) in
         { opam_nv ; opam_dir ; opam_file ; opam_changes }
     )
   @@ obj4
   (req "nv" string)
   (opt "dir" string)
   (opt "content" string)
-  (opt "changes" string)
+  (opt "changes" (list (tup2 string file_change)))

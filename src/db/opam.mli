@@ -11,4 +11,5 @@
 
 val opamroot_dir : string
 
-val load_state : unit -> Types.global_state
+val get_partial_state :
+  ?state_times:Types.state_times -> unit -> Types.partial_state

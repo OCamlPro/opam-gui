@@ -10,7 +10,7 @@
 (**************************************************************************)
 
 val opam_config_summary :
-  Types.global_state ->
+  Types.state ->
   Types.opam_config_summary
 
 (*

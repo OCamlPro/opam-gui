@@ -23,27 +23,9 @@ let string = function
 
 let string_list list = List.map string list
 
-let opam_config_summary gs =
+let opam_config_summary ( s : Types.state ) =
   {
-    repositories = gs.repos_list;
-    installed_switches = StringMap.bindings gs.switches |> List.map fst;
-    switch = gs.opam_config.config_current_switch;
+    repositories = s.global_state.global_repos;
+    installed_switches = StringMap.bindings s.switch_states |> List.map fst;
+    switch = s.global_state.global_current_switch;
   }
-
-(* Unfortunately, OpamFile from opam-format cannot be used in JSOO:
-
-let switch_state switch =
-  match switch.switch_state with
-  | None -> None
-  | Some content ->
-    Some ( OpamFile.SwitchSelections.read_from_string content )
-
-let switch_config switch =
-  match switch.switch_config with
-  | None -> None
-  | Some content ->
-    Some ( OpamFile.Switch_config.read_from_string content )
-
-let opam_config config =
-  OpamFile.Config.read_from_string config.opam_config
-*)

@@ -24,10 +24,18 @@ let version : (version, exn, no_security) service0 =
     Path.(root // "version")
 
 
-(* Use OpamUtils.summary to parse the most useful fields *)
-let global_state : (global_state, exn, no_security) service0 =
+let state : (partial_state, exn, no_security) service0 =
   service
     ~section:section_main
     ~name:"opam_config"
-    ~output:global_state
-    Path.(root // "global_state")
+    ~output:partial_state
+    Path.(root // "state")
+
+let partial_state : (state_times, partial_state, exn, no_security)
+    post_service0 =
+  post_service
+    ~section:section_main
+    ~name:"opam_config"
+    ~input:state_times
+    ~output:partial_state
+    Path.(root // "partial_state")

@@ -14,7 +14,12 @@ val version :
   unit ->
   (Types.version, exn) result RestoDirectory1.Answer.answer Lwt.t
 
-val global_state :
+val state :
   EzAPI.request ->
   unit ->
-  (Types.global_state, exn) result RestoDirectory1.Answer.answer Lwt.t
+  (Types.partial_state, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val partial_state :
+  EzAPI.request ->
+  Types.state_times ->
+  (Types.partial_state, exn) result RestoDirectory1.Answer.answer Lwt.t

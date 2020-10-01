@@ -12,5 +12,6 @@
 val version :
   ?error:EzRequest.error_handler -> (Types.version -> unit) -> unit
 
-val global_state :
-  ?error:EzRequest.error_handler -> (Types.global_state -> unit) -> unit
+val state :
+  ?error:EzRequest.error_handler ->
+  ?state_times:Types.state_times -> (Types.partial_state -> unit) -> unit

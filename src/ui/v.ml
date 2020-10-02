@@ -21,19 +21,14 @@ class type app = object
   method database : js_string t prop
   method db_version_ : int prop
 
+  method current_switch_ : js_string t prop
+  method selected_switch_ : js_string t prop
+
   method switches : switches_js t js_array t prop
   method switches_busy_ : bool t prop
-  method switches_provider_ :
-    unit ->
-    ((switches_js t js_array t, unit) Ezjs_min.Promise.promise0 t) meth
 
   method packages : packages_js t js_array t prop
   method packages_busy_ : bool t prop
-  method packages_provider_ :
-    unit ->
-    ((packages_js t js_array t, unit) Ezjs_min.Promise.promise0 t) meth
-
-  method some_action_ : unit meth
 end
 
 include Vue_js.Make(struct
@@ -86,14 +81,24 @@ let get_state f =
   | Some s -> f s
 
 let init path =
-  let data = object%js (self)
+  let data : app t = object%js (self)
     val mutable path = path
     val mutable database = string ""
     val mutable db_version_ = 0
 
+    val mutable current_switch_ = string ""
+    val mutable selected_switch_ = string ""
+
     val mutable switches = array [| |]
     val mutable switches_busy_ = bool false
-    method switches_provider_ ctxt =
+
+    val mutable packages = array [| |]
+    val mutable packages_busy_ = bool false
+    end
+  in
+
+  add_method1 "switches_provider" (fun this ctxt ->
+
       Ezjs_min.Promise.promise (fun resolve _reject ->
           get_state (fun ( gs : Types.state ) ->
               let sum = OpamUtils.opam_config_summary gs in
@@ -106,28 +111,41 @@ let init path =
                       | None -> false
                       | Some sw' -> String.equal sw sw'
                     in
+                    if current then
+                      this##.current_switch_ := string sw;
+                    if current && to_string this##.selected_switch_ == "" then
+                      this##.selected_switch_ := string sw;
                     (sw, swc.Types.switch_dirname, current) :: acc
                   ) gs.switch_states []
               in
-              self##.switches := list_to_js switch_to_js switches;
-              resolve (self##.switches)
+              this##.switches := list_to_js switch_to_js switches;
+              resolve (this##.switches)
             )
         )
+    );
 
-    val mutable packages = array [| |]
-    val mutable packages_busy_ = bool false
-    method packages_provider_ ctxt =
+  add_method1 "packages_provider" (fun this ctxt ->
+
       Ezjs_min.Promise.promise (fun resolve _reject ->
-          self##.packages :=
-            array [| package_to_js ("base", true);
-                     package_to_js ("dune", true);
-                     package_to_js ("js_of_ocaml", true) |];
-          resolve (self##.packages)
+          let ssw = to_string this##.selected_switch_ in
+          if ssw = "" then
+            resolve (array [| |])
+          else
+            get_state (fun (gs : Types.state) ->
+                match EzCompat.StringMap.find_opt ssw gs.switch_states with
+                | None ->
+                    resolve (array [| |])
+                | Some sw ->
+                    this##.packages :=
+                      list_to_js package_to_js
+                        (List.map (fun s -> (s, true)) sw.switch_installed);
+                    resolve (this##.packages)
+              )
         )
+    );
 
-    method some_action_ = Unsafe.eval_string "alert('test')"
 
-    end
-  in
+  add_method0 "some_action" (fun this ->
+      Unsafe.eval_string "alert('test')");
 
   init ~data ~show:true ()

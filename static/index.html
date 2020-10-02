@@ -20,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js" defer></script>
 
     <script src="%{project_name}-ui.js" defer></script>
+
   </head>
   <body class="bg-light text-dark">
     <div id="app-loading"></div>
@@ -57,17 +58,35 @@
             <!-- Top line -->
             <b-row>
               <b-col>
-                <b-table sticky-header small hover outlined
-                         selectable no-select-on-click
-                         :busy.sync="switches_busy"
-                         :items="switches_provider"
-                         :fields="[{ key:'current', label:'',
-                                     thStyle:'width: max-content'},
-                                   { key:'name',
-                                     label:'List of your switches',
-                                     thStyle:'width:50%'},
-                                   { key:'path', label:'',
-                                     thStyle:'width:500%'}]">
+                <b-table
+                  ref="switches"
+                  sticky-header small hover outlined show-empty
+                  selectable select-mode="single"
+                  @refreshed="() => {
+                    var sw = this.$refs.switches;
+                    var i = setInterval(function() {
+                      if (!sw.busy) {
+                        clearInterval(i);
+                        sw.selectRow(3);
+                      }; }, 0) }"
+                  @row-selected="(items) => {
+                                 this.selected_switch = items[0].name;
+                                 this.$refs.packages.refresh(); }"
+                  :busy.sync="switches_busy"
+                  :items="switches_provider"
+                  :fields="[{ key:'current', label:'',
+                              thStyle:'width: max-content'},
+                            { key:'name',
+                              label:'List of your switches',
+                              thStyle:'width:50%'},
+                            { key:'path', label:'',
+                              thStyle:'width:500%'}]">
+
+                  <template v-slot:empty>
+                    <div class="text-center text-danger my-2">
+                      <strong>No data</strong>
+                    </div>
+                  </template>
 
                   <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">
@@ -89,24 +108,34 @@
 
                   </template>
 
+                  <!-- <template v-slot:row-details="row"> -->
+                  <!-- </template> -->
+
                 </b-table>
 
               </b-col>
             </b-row>
 
-            <!-- Bottom line -->
             <b-row>
               <b-col>
-                <b-table sticky-header small hover outlined
-                         :busy.sync="packages_busy"
-                         :items="packages_provider"
-                         :fields="[{ key:'installed', label:'',
-                                     thStyle:'width: max-content'},
-                                   { key:'name',
-                                     label:'Packages for the current switch',
-                                     thStyle:'width:100%'}]">
+                <b-table
+                  ref="packages"
+                  sticky-header small hover outlined show-empty
+                  :busy.sync="packages_busy"
+                  :items="packages_provider"
+                  :fields="[{ key:'installed', label:'',
+                              thStyle:'width: max-content'},
+                            { key:'name',
+                              label:'Packages for the current switch',
+                              thStyle:'width:100%'}]">
 
-                  <!-- <template v-slot:head(installed)="row">&nbsp;</template> -->
+              <!-- <template v-slot:head(installed)="row">&nbsp;</template> -->
+
+                  <template v-slot:empty>
+                    <div class="text-center text-danger my-2">
+                      <strong>No data</strong>
+                    </div>
+                  </template>
 
                   <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">

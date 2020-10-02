@@ -64,11 +64,15 @@
                   selectable select-mode="single"
                   @refreshed="() => {
                     var sw = this.$refs.switches;
-                    var i = setInterval(function() {
-                      if (!sw.busy) {
-                        clearInterval(i);
-                        sw.selectRow(3);
-                      }; }, 0) }"
+                    var sitems = sw.sortedItems;
+                    var idx = 0;
+                    while (idx < sitems.length &&
+                           sitems[idx].name != this.selected_switch) ++idx;
+                    if (idx < sitems.length) {
+                      var iv = setInterval(() => {
+                        if (!sw.busy) { clearInterval(iv); sw.selectRow(idx); }
+                      }, 10)
+                    } }"
                   @row-selected="(items) => {
                                  this.selected_switch = items[0].name;
                                  this.$refs.packages.refresh(); }"
@@ -78,41 +82,40 @@
                               thStyle:'width: max-content'},
                             { key:'name',
                               label:'List of your switches',
-                              thStyle:'width:50%'},
+                              thStyle:'width:40%'},
                             { key:'path', label:'',
-                              thStyle:'width:500%'}]">
+                              thStyle:'width:40%'},
+                            { key:'time', label:'',
+                              thStyle:'width:20%'}]">
 
                   <template v-slot:empty>
                     <div class="text-center text-danger my-2">
-                      <strong>No data</strong>
+                      <strong>No switch found</strong>
                     </div>
                   </template>
 
                   <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">
                       <b-spinner class="align-middle"></b-spinner>
-                      <strong>Loading...</strong>
+                      <strong>Loading switches...</strong>
                     </div>
                   </template>
 
                   <template v-slot:cell(current)="row">
-
                     <template v-if="row.value">
                       <span aria-hidden="true">&check;</span>
-                      <span class="sr-only">Selected</span>
+                      <span class="sr-only">Current switch</span>
                     </template>
                     <template v-else>
                       <span aria-hidden="true">&nbsp;</span>
-                      <span class="sr-only">Not selected</span>
                     </template>
-
                   </template>
 
-                  <!-- <template v-slot:row-details="row"> -->
-                  <!-- </template> -->
+                  <template v-slot:cell(time)="row">
+                    {{ row.value }}
+                  </template>
 
                 </b-table>
-
               </b-col>
             </b-row>
 
@@ -121,6 +124,8 @@
                 <b-table
                   ref="packages"
                   sticky-header small hover outlined show-empty
+                  @row-clicked="(item, index, event) => {
+                    this.$refs.packages.toggleDetailsFactory(true, item)(); }"
                   :busy.sync="packages_busy"
                   :items="packages_provider"
                   :fields="[{ key:'installed', label:'',
@@ -133,20 +138,25 @@
 
                   <template v-slot:empty>
                     <div class="text-center text-danger my-2">
-                      <strong>No data</strong>
+                      <strong>No packages for the selected switch</strong>
                     </div>
                   </template>
 
                   <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">
                       <b-spinner class="align-middle"></b-spinner>
-                      <strong>Loading...</strong>
+                      <strong>Loading packages...</strong>
                     </div>
                   </template>
 
                   <template v-slot:cell(installed)="row">
-                    <b-form-checkbox v-model="row.value">
-                    </b-form-checkbox>
+                    <b-form-checkbox v-model="row.value" />
+                  </template>
+
+                  <template v-slot:row-details="row">
+                    <b-card>
+                      Package details...
+                    </b-card>
                   </template>
 
                 </b-table>

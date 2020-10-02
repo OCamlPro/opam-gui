@@ -22,6 +22,7 @@ end
 class type switches_js = object
   method name : js_string t prop
   method path : js_string t prop
+  method time : js_string t prop
   method current : bool t prop
 end
 
@@ -51,9 +52,16 @@ include Vue_js.Make(struct
     let id = "app"
   end)
 
-let switch_to_js (n, p, c) =
+let switch_to_js (n, p, t, c) =
    object%js val mutable name = string n
      val mutable path = string p
+     val mutable time =
+       let t = Unix.localtime (Int64.to_float t) in
+       let t = Printf.sprintf "%02d/%02d/%04d %02d:%02d:%02d"
+         t.tm_mday t.tm_mon (t.tm_year + 1900)
+         t.tm_hour t.tm_min t.tm_sec
+       in
+       string t
      val mutable current = bool c end
 
 let package_to_js (n, i) =
@@ -154,9 +162,17 @@ let init path =
                     in
                     if current then
                       this##.current_switch_ := string sw;
-                    if current && to_string this##.selected_switch_ == "" then
+                    if current && to_string this##.selected_switch_ = "" then
                       this##.selected_switch_ := string sw;
-                    (sw, swc.Types.switch_dirname, current) :: acc
+
+                    let time =
+                      match EzCompat.StringMap.find_opt sw
+                              gs.state_times.switches_mtime with
+                      | None -> Int64.zero
+                      | Some t -> t
+                    in
+
+                    (sw, swc.Types.switch_dirname, time, current) :: acc
                   ) gs.switch_states []
               in
               this##.switches := list_to_js switch_to_js switches;

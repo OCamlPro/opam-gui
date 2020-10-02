@@ -29,6 +29,10 @@ module MakeRegisterer(S: module type of Services)(H:module type of Handlers) = s
   |> register S.switch H.switch
   |> register S.switch_opam H.switch_opam
   |> register S.switch_opam_extra H.switch_opam_extra
+  |> register S.opam H.opam
+  |> register S.opam_get H.opam_get
+  |> register S.poll H.poll
+  |> register S.poll_get H.poll_get
 
 end
 

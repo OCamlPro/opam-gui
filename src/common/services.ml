@@ -116,3 +116,45 @@ let switch_opam_extra :
     ~name:"switch_opams"
     ~output:( list opam_extra )
     Path.(root // "switch_opam_extra" /: arg_switch_nv)
+
+let arg_command =
+  EzAPI.arg_string "command" "COMMAND"
+
+let arg_pid_line =
+  EzAPI.arg_string "pid_line" "12334,0"
+
+let opam :
+  (string list, Types.call_status, exn, no_security) post_service0 =
+  post_service
+    ~section:section_main
+    ~name:"call_get"
+    ~input:( list string )
+    ~output:call_status
+    Path.(root // "opam" )
+
+let poll :
+  (int * int, Types.call_status, exn, no_security) post_service0 =
+  post_service
+    ~section:section_main
+    ~name:"poll_get"
+    ~input: ( tup2 int int )
+    ~output:call_status
+    Path.(root // "poll")
+
+let opam_get :
+  (string, Types.call_status, exn, no_security)
+    service1 =
+  service
+    ~section:section_main
+    ~name:"opam_get"
+    ~output:call_status
+    Path.(root // "opam_get" /: arg_command)
+
+let poll_get :
+  (string, Types.call_status, exn, no_security)
+    service1 =
+  service
+    ~section:section_main
+    ~name:"poll_get"
+    ~output:call_status
+    Path.(root // "poll_get" /: arg_pid_line)

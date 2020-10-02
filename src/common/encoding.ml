@@ -245,3 +245,55 @@ let opam_extra = conv
   (opt "dir" string)
   (opt "content" string)
   (opt "changes" (list (tup2 string file_change)))
+
+let process_status = conv
+    (function
+        Unix.WEXITED n -> "exit" , n
+      | WSIGNALED n -> "sig", n
+      | WSTOPPED n -> "stop", n
+    )
+    (function
+         "exit", n -> Unix.WEXITED n
+      | "sig", n -> WSIGNALED n
+      | "stop", n -> WSTOPPED n
+      | _ -> assert false
+    )
+  @@
+  obj2
+    (req "status" string)
+    (dft "code" int 0)
+
+
+let log_line = conv
+    (fun (line, log, content) ->
+       match log with
+       | "out" -> line, content
+       | "err" -> -line, content
+       | _ -> assert false
+    )
+    (fun ( line, content ) ->
+       if line < 0 then
+         -line, "err", content
+       else
+         line, "out", content
+    )
+  @@
+  tup2 int string
+
+let call_status = conv
+    (fun
+      { call_pid ; call_command ; call_line ; call_log ; call_status }
+      ->
+        ( call_pid, call_command, call_line, call_log, call_status )
+    )
+    (fun
+      ( call_pid, call_command, call_line, call_log, call_status )
+      ->
+        { call_pid ; call_command ; call_line ; call_log ; call_status }
+    )
+  @@ obj5
+    (req "pid" int )
+    (req "command" ( array string ) )
+    (dft "line" int 0 )
+    (dft "log" ( array log_line ) [||] )
+    (opt "status" process_status )

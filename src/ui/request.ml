@@ -47,3 +47,10 @@ let switch_opams ?error ~switch ~packages f =
       query_switch_opams_switch = switch ;
       query_switch_opams_packages = packages ;
     } f
+
+
+let opam ?error command f =
+  post0 S.opam ?error f ~input:command
+
+let poll ?error pid_line f =
+  post0 S.poll ?error f ~input:pid_line

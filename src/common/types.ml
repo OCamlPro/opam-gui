@@ -100,8 +100,13 @@ type switch_opams_query = {
   query_switch_opams_packages : string list ; (* NAME.VERSION *)
 }
 
-
-
+type call_status = {
+  call_pid : int ;
+  call_command : string array ;
+  call_line : int ;
+  call_log : (int * string * string) array ;
+  call_status : Unix.process_status option ;
+}
 
 (******************* WITHOUT ENCODINGS ***************************)
 

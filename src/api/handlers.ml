@@ -61,3 +61,21 @@ let switch_opam_extra (_req, switch_nv) q =
 
 let switch (_req, switch) () =
   to_api @@ (fun () -> Opam.switch switch)
+
+let opam _req command =
+  to_api @@ (fun () ->  Opam_lwt.call command)
+
+let opam_get (_req, command) () =
+  to_api @@ (fun () ->
+      let command = EzString.split command ',' in
+      Opam_lwt.call command)
+
+let poll _req (pid,line) =
+  to_api @@ (fun () -> Opam_lwt.poll pid line)
+
+let poll_get (_req, pid_line) () =
+  to_api @@ (fun () ->
+      let pid, line = EzString.cut_at pid_line ',' in
+      let pid = int_of_string pid in
+      let line = if line = "" then 0 else int_of_string line in
+      Opam_lwt.poll pid line)

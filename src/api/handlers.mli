@@ -47,3 +47,19 @@ val switch_opam_extra :
 val switch :
   EzAPI.request * string -> unit ->
   (Types.switch_state, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val opam :
+  EzAPI.request -> string list ->
+  (Types.call_status, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val opam_get :
+  EzAPI.request * string -> unit ->
+  (Types.call_status, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val poll :
+  EzAPI.request -> int * int ->
+  (Types.call_status, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val poll_get :
+  EzAPI.request * string -> unit ->
+  (Types.call_status, exn) result RestoDirectory1.Answer.answer Lwt.t

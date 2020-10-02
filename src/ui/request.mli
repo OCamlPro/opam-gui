@@ -25,3 +25,15 @@ val switch_opams :
   ?error:EzRequest.error_handler ->
   switch:string -> packages:string list ->
   (Types.opam_file list -> unit) -> unit
+
+
+(* the argument is the subcommand of opam, i.e. [ "upgrade" ] for example *)
+val opam :
+  ?error:EzRequest.error_handler ->
+  string list -> (Types.call_status -> unit) -> unit
+
+(* the argument of `poll` is `pid,line`, i.e. the pid of the command and
+   the last line in the log we received. 0 at the beginning. *)
+val poll :
+  ?error:EzRequest.error_handler ->
+  int * int -> (Types.call_status -> unit) -> unit

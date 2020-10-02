@@ -2,4 +2,4 @@
 (library
  (name opamgui_db)
  (wrapped false)
- (libraries opamgui_common opam-file-format ez_file opam-state))
+ (libraries opamgui_common opam-file-format ez_file opam-state lwt.unix))

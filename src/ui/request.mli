@@ -37,3 +37,7 @@ val opam :
 val poll :
   ?error:EzRequest.error_handler ->
   int * int -> (Types.call_status -> unit) -> unit
+
+val processes :
+  ?error:EzRequest.error_handler ->
+  (Types.call_status list -> unit) -> unit

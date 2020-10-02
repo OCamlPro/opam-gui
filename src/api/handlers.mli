@@ -63,3 +63,7 @@ val poll :
 val poll_get :
   EzAPI.request * string -> unit ->
   (Types.call_status, exn) result RestoDirectory1.Answer.answer Lwt.t
+
+val processes :
+  EzAPI.request -> unit ->
+  (Types.call_status list, exn) result RestoDirectory1.Answer.answer Lwt.t

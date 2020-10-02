@@ -26,11 +26,11 @@ type process = {
   mutable process_log : (int * string * string) list ;
 }
 
-let processes = Hashtbl.create 113
+let process_table = Hashtbl.create 113
 
 (* let create process_command = *)
 
-let call_status p line =
+let call_status ?line p =
   let call_status = match p.process_status with
     | Running _ -> None
     | Exited s -> Some s
@@ -44,7 +44,9 @@ let call_status p line =
       else
         call_log
   in
-  let call_log = iter p.process_log line [] in
+  let call_log, line = match line with
+    | None -> [], 0
+    | Some line -> iter p.process_log line [], line in
   let call_log = Array.of_list call_log in
   {
     call_pid = p.process_pid ;
@@ -127,9 +129,16 @@ let call command =
       );
     Lwt.async (fun () -> read_output p "out" po#stdout);
     Lwt.async (fun () -> read_output p "err" po#stderr);
-    Hashtbl.add processes process_pid p  ;
-    call_status p 0
+    Hashtbl.add process_table process_pid p  ;
+    call_status p ~line:0
 
 let poll pid line =
-  let p = Hashtbl.find processes pid in
-  call_status p line
+  let p = Hashtbl.find process_table pid in
+  call_status p ~line
+
+let processes () =
+  let list = ref [] in
+  Hashtbl.iter (fun _ p ->
+      list := call_status p :: !list
+    ) process_table ;
+  !list

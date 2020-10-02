@@ -79,3 +79,6 @@ let poll_get (_req, pid_line) () =
       let pid = int_of_string pid in
       let line = if line = "" then 0 else int_of_string line in
       Opam_lwt.poll pid line)
+
+let processes _req () =
+  to_api @@ (fun () -> Opam_lwt.processes ())

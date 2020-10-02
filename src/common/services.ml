@@ -158,3 +158,12 @@ let poll_get :
     ~name:"poll_get"
     ~output:call_status
     Path.(root // "poll_get" /: arg_pid_line)
+
+let processes :
+  (Types.call_status list, exn, no_security)
+    service0 =
+  service
+    ~section:section_main
+    ~name:"processes"
+    ~output:(list call_status)
+    Path.(root // "processes")

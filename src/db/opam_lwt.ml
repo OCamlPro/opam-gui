@@ -21,16 +21,18 @@ type process_status =
 type process = {
   process_command : string array ;
   process_pid : int ;
+  process_time_begin : int64 ;
+  mutable process_time_end : int64 option ;
   mutable process_status : process_status ;
   mutable process_line : int ;
   mutable process_log : (int * string * string) list ;
 }
 
-let processes = Hashtbl.create 113
+let process_table = Hashtbl.create 113
 
 (* let create process_command = *)
 
-let call_status p line =
+let call_status ?line p =
   let call_status = match p.process_status with
     | Running _ -> None
     | Exited s -> Some s
@@ -44,14 +46,20 @@ let call_status p line =
       else
         call_log
   in
-  let call_log = iter p.process_log line [] in
+  let call_log, line = match line with
+    | None -> [], 0
+    | Some line -> iter p.process_log line [], line in
   let call_log = Array.of_list call_log in
+  let call_time_begin = p.process_time_begin in
+  let call_time_end = p.process_time_end in
   {
     call_pid = p.process_pid ;
     call_command = p.process_command ;
     call_line = line ;
     call_log ;
     call_status ;
+    call_time_begin ;
+    call_time_end ;
   }
 
 let rec read_output p name lwt_io =
@@ -117,19 +125,30 @@ let call command =
         process_pid ;
         process_line ;
         process_log ;
+        process_time_begin = Unix.gettimeofday () |> Int64.of_float ;
+        process_time_end = None ;
       } in
     Lwt.async (fun () ->
         Lwt.bind process_status
           (fun process_status ->
+             p.process_time_end <- Some (
+                 Unix.gettimeofday () |> Int64.of_float );
              p.process_status <- Exited process_status;
              Lwt.return_unit
           )
       );
     Lwt.async (fun () -> read_output p "out" po#stdout);
     Lwt.async (fun () -> read_output p "err" po#stderr);
-    Hashtbl.add processes process_pid p  ;
-    call_status p 0
+    Hashtbl.add process_table process_pid p  ;
+    call_status p ~line:0
 
 let poll pid line =
-  let p = Hashtbl.find processes pid in
-  call_status p line
+  let p = Hashtbl.find process_table pid in
+  call_status p ~line
+
+let processes () =
+  let list = ref [] in
+  Hashtbl.iter (fun _ p ->
+      list := call_status p :: !list
+    ) process_table ;
+  !list

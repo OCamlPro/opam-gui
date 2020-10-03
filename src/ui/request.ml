@@ -54,3 +54,5 @@ let opam ?error command f =
 
 let poll ?error pid_line f =
   post0 S.poll ?error f ~input:pid_line
+
+let processes ?error f =  get0 S.processes ?error f

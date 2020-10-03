@@ -33,6 +33,7 @@ module MakeRegisterer(S: module type of Services)(H:module type of Handlers) = s
   |> register S.opam_get H.opam_get
   |> register S.poll H.poll
   |> register S.poll_get H.poll_get
+  |> register S.processes H.processes
 
 end
 

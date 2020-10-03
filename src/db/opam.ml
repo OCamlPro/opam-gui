@@ -50,7 +50,7 @@ let rec mtimes filenames =
   | filename :: filenames ->
     max (mtime filename) (mtimes filenames)
 
-let current_time = ref ( Unix.gettimeofday ())
+let current_time = ref ( Unix.gettimeofday () )
 let settime () = current_time := Unix.gettimeofday ()
 
 let state = ref None

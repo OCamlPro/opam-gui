@@ -103,6 +103,8 @@ type switch_opams_query = {
 type call_status = {
   call_pid : int ;
   call_command : string array ;
+  call_time_begin : int64 ;
+  call_time_end : int64 option ;
   call_line : int ;
   call_log : (int * string * string) array ;
   call_status : Unix.process_status option ;

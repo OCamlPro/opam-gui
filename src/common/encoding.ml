@@ -282,18 +282,24 @@ let log_line = conv
 
 let call_status = conv
     (fun
-      { call_pid ; call_command ; call_line ; call_log ; call_status }
+      { call_pid ; call_command ; call_line ; call_log ;
+        call_status ; call_time_begin ; call_time_end }
       ->
-        ( call_pid, call_command, call_line, call_log, call_status )
+        ( call_pid, call_command, call_line, call_log,
+          call_status,  call_time_begin, call_time_end )
     )
     (fun
-      ( call_pid, call_command, call_line, call_log, call_status )
+      ( call_pid, call_command, call_line, call_log,
+        call_status,  call_time_begin, call_time_end )
       ->
-        { call_pid ; call_command ; call_line ; call_log ; call_status }
+        { call_pid ; call_command ; call_line ; call_log ;
+          call_status ; call_time_begin ; call_time_end }
     )
-  @@ obj5
+  @@ obj7
     (req "pid" int )
     (req "command" ( array string ) )
     (dft "line" int 0 )
     (dft "log" ( array log_line ) [||] )
     (opt "status" process_status )
+    (req "begin" int64 )
+    (opt "end" int64 )

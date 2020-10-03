@@ -21,6 +21,8 @@ type process_status =
 type process = {
   process_command : string array ;
   process_pid : int ;
+  process_time_begin : int64 ;
+  mutable process_time_end : int64 option ;
   mutable process_status : process_status ;
   mutable process_line : int ;
   mutable process_log : (int * string * string) list ;
@@ -48,12 +50,16 @@ let call_status ?line p =
     | None -> [], 0
     | Some line -> iter p.process_log line [], line in
   let call_log = Array.of_list call_log in
+  let call_time_begin = p.process_time_begin in
+  let call_time_end = p.process_time_end in
   {
     call_pid = p.process_pid ;
     call_command = p.process_command ;
     call_line = line ;
     call_log ;
     call_status ;
+    call_time_begin ;
+    call_time_end ;
   }
 
 let rec read_output p name lwt_io =
@@ -119,10 +125,14 @@ let call command =
         process_pid ;
         process_line ;
         process_log ;
+        process_time_begin = Unix.gettimeofday () |> Int64.of_float ;
+        process_time_end = None ;
       } in
     Lwt.async (fun () ->
         Lwt.bind process_status
           (fun process_status ->
+             p.process_time_end <- Some (
+                 Unix.gettimeofday () |> Int64.of_float );
              p.process_status <- Exited process_status;
              Lwt.return_unit
           )

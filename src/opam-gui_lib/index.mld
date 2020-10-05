@@ -1,0 +1,7 @@
+
+{1 Library opam-gui_lib}
+
+opam-gui providess a graphical interface for opam.
+
+
+The entry point of this library is the module: {!Opam_gui_lib}.

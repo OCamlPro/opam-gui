@@ -1,0 +1,14 @@
+lib: [
+  "_build/install/default/lib/opam-gui/META"
+  "_build/install/default/lib/opam-gui/dune-package"
+  "_build/install/default/lib/opam-gui/opam"
+]
+bin: [
+  "_build/install/default/bin/opam-gui"
+]
+doc: [
+  "_build/install/default/doc/opam-gui/CHANGES.md"
+  "_build/install/default/doc/opam-gui/LICENSE.md"
+  "_build/install/default/doc/opam-gui/README.md"
+  "_build/install/default/doc/opam-gui/odoc-pages/index.mld" {"odoc-pages/index.mld"}
+]

@@ -241,12 +241,12 @@ let convert_switch_state gt st =
   }
 
 let switch switch =
-  let { gt ; rt ; switches } = get_state () in
+  let { gt ; rt = _ ; switches } = get_state () in
   let switch_state = StringMap.find switch switches in
   convert_switch_state gt switch_state
 
 let get_partial_state ?( state_times = prehistoric_times () ) () =
-  let { gt ; rt ; switches } = read_state () in
+  let { gt ; rt = _ ; switches } = read_state () in
 
   let partial_state_times = { times with global_mtime = times.global_mtime } in
   let global_opamroot = OpamFilename.Dir.to_string gt.root in
@@ -305,7 +305,7 @@ let get_partial_state ?( state_times = prehistoric_times () ) () =
   }
 
 let switch_packages switch =
-  let { gt ; rt ; switches } = get_state () in
+  let { gt = _ ; rt = _ ; switches } = get_state () in
   let switch_state = StringMap.find switch switches in
   let packages = ref [] in
   OpamPackage.Set.iter (fun p ->
@@ -323,7 +323,7 @@ let set_of_formula formula =
   }
 
 let switch_opams switch packages =
-  let { gt ; rt ; switches } = get_state () in
+  let { gt = _ ; rt = _ ; switches } = get_state () in
   let switch_state = StringMap.find switch switches in
   let opams = ref [] in
   List.iter (fun nv ->
@@ -382,7 +382,7 @@ let switch_opams switch packages =
   !opams
 
 let switch_opam_extras switch packages =
-  let { gt ; rt ; switches } = get_state () in
+  let { gt ; rt = _ ; switches } = get_state () in
   let switch_state = StringMap.find switch switches in
   List.map (fun opam_nv ->
       let p = OpamPackage.of_string opam_nv in
@@ -402,7 +402,7 @@ let switch_opam_extras switch packages =
           let opam_file = EzFile.read_file ( opam_dir // "opam" ) in
           Some opam_dir, Some opam_file
       in
-      let (n,v) = EzString.cut_at opam_nv '.' in
+      let (n,_v) = EzString.cut_at opam_nv '.' in
       let switch_meta = switch_meta ~gt switch_state.switch in
       let opam_changes =
         let filename = switch_meta // "install" // ( n ^ ".changes") in

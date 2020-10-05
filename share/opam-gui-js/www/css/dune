@@ -1,0 +1,9 @@
+
+(install
+ (files
+   (main.css as www/css/main.css)
+   (bootstrap.min.css as www/css/bootstrap.min.css)
+   (bootstrap-vue.min.css as www/css/bootstrap-vue.min.css)
+ )
+ (section share)
+ (package opam-gui-js))

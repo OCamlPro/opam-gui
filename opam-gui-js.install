@@ -1,0 +1,24 @@
+lib: [
+  "_build/install/default/lib/opam-gui-js/META"
+  "_build/install/default/lib/opam-gui-js/dune-package"
+  "_build/install/default/lib/opam-gui-js/opam"
+]
+bin: [
+  "_build/install/default/bin/opam-gui-js"
+]
+share: [
+  "_build/install/default/share/opam-gui-js/www/css/bootstrap-vue.min.css" {"www/css/bootstrap-vue.min.css"}
+  "_build/install/default/share/opam-gui-js/www/css/bootstrap.min.css" {"www/css/bootstrap.min.css"}
+  "_build/install/default/share/opam-gui-js/www/css/main.css" {"www/css/main.css"}
+  "_build/install/default/share/opam-gui-js/www/index.html" {"www/index.html"}
+  "_build/install/default/share/opam-gui-js/www/js/bootstrap-vue-icons.min.js" {"www/js/bootstrap-vue-icons.min.js"}
+  "_build/install/default/share/opam-gui-js/www/js/bootstrap-vue.min.js" {"www/js/bootstrap-vue.min.js"}
+  "_build/install/default/share/opam-gui-js/www/js/vue.js" {"www/js/vue.js"}
+  "_build/install/default/share/opam-gui-js/www/opam-gui-ui.js" {"www/opam-gui-ui.js"}
+]
+doc: [
+  "_build/install/default/doc/opam-gui-js/CHANGES.md"
+  "_build/install/default/doc/opam-gui-js/LICENSE.md"
+  "_build/install/default/doc/opam-gui-js/README.md"
+  "_build/install/default/doc/opam-gui-js/odoc-pages/index.mld" {"odoc-pages/index.mld"}
+]

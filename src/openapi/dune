@@ -1,0 +1,4 @@
+(executable
+ (name openapi)
+ (modules openapi doc)
+ (libraries opamgui_common ez-api.server))

@@ -9,23 +9,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Types
-open OpamParserTypes
-open EzCompat
-
-let expect_error ty s =
-  Printf.kprintf failwith
-    "Error: expected %s instead of %s" ty (OpamPrinter.value s)
-
-let string = function
-  | String (_pos, s) -> s
-  | s -> expect_error "string" s
-
-let _string_list list = List.map string list
-
-let opam_config_summary ( s : Types.state ) =
-  {
-    repositories = s.global_state.global_repos;
-    installed_switches = StringMap.bindings s.switch_states |> List.map fst;
-    switch = s.global_state.global_current_switch;
-  }
+let port = 9988
+let project_name = "opam-gui"

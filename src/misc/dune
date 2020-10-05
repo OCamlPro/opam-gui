@@ -2,4 +2,4 @@
  (name opamgui_misc)
  (modules misc)
  (wrapped false)
- (libraries opamgui_config stdlib-shims))
+ (libraries stdlib-shims))

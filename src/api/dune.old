@@ -1,0 +1,6 @@
+
+(library
+ (name opamgui_api)
+ (wrapped false)
+ (modules handlers api)
+ (libraries ez-api.server opamgui_db))

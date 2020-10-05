@@ -1,0 +1,7 @@
+
+{
+    "ocaml.sandbox": {
+        "kind": "opam"
+        "switch": "/home/lefessan/GIT/ocp/public-github/opam-gui"
+    }
+}

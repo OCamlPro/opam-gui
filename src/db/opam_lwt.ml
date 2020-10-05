@@ -9,10 +9,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open EzCompat (* for StringMap *)
 open Types
-open EzFile.OP
-open OpamStateTypes
 
 type process_status =
     Running of Unix.process_status Lwt.t
@@ -40,7 +37,7 @@ let call_status ?line p =
   let rec iter process_log line call_log =
     match process_log with
     | [] -> call_log
-    | ( ( l, kind, content ) as entry ) :: process_log ->
+    | ( ( l, _kind, _content ) as entry ) :: process_log ->
       if l > line then
         iter process_log line ( entry :: call_log )
       else
@@ -85,7 +82,7 @@ let very_unsafe = try
 let call command =
   match command with
   | [] -> failwith "empty opam command"
-  | subcmd :: args ->
+  | subcmd :: _args ->
     let command =
       match subcmd with
       | "help"

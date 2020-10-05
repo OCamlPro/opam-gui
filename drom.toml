@@ -1,0 +1,101 @@
+[project]
+drom-version = "0.1.0"
+
+[project]
+authors = ["David Declerck <david.declerck@ocamlpro.com>", "Fabrice Le Fessant <fabrice.le_fessant@origin-labs.com>"]
+copyright = "OCamlPro SAS & Origin Labs SAS"
+edition = "4.10.0"
+github-organization = "ocamlpro"
+license = "LGPL2"
+min-edition = "4.10.0"
+mode = "binary"
+name = "opam-gui"
+synopsis = "A GUI for opam to manage switches"
+version = "0.1.0"
+windows-ci = true
+
+# keys that you could also define:
+# sphinx-target = "...sphinx-target..."
+# archive = "...archive..."
+# dev-repo = "...dev-repo..."
+# bug-reports = "...bug-reports..."
+# doc-api = "...doc-api..."
+# doc-gen = "...doc-gen..."
+# homepage = "...homepage..."
+
+[project]
+description = """
+opam-gui providess a graphical interface for opam.
+"""
+
+[drom]
+skip = "README.md src/opam-gui/main.ml src/opam-gui-js/main.ml"
+
+[dependencies]
+calendar = "2.04"
+ocplib_stuff = "0.2.2"
+opam-file-format = "2.1.0"
+re = "1.9.0"
+
+[tools]
+ez-api = ""
+[tools.ocamlformat]
+for-test = true
+[tools.odoc]
+for-doc = true
+[tools.ppx_expect]
+for-test = true
+[tools.ppx_inline_test]
+for-test = true
+
+[project]
+generators = ["ocamllex", "ocamlyacc"]
+pack-modules = true
+skip-dirs = []
+build-profile = "release"
+
+
+[project.fields]
+project-dune-dirs = "share"
+
+[[package]]
+dir = "src/opam-gui"
+kind = "program"
+name = "opam-gui"
+skeleton = "program"
+[package.dependencies]
+opam-state = "2.0.7"
+geoip = "0.0.3"
+ez_file = "0.2.0"
+cohttp-lwt-unix = "2.5.4"
+[package.tools]
+opam-gui-js = "version"
+
+[package.fields]
+dune-libraries = "ez-api.server opamgui_db"
+opam-trailer = '''
+pin-depends: [
+  [ "ez-api.~dev" "git+https://github.com/ocamlpro/ez-api.git" ]
+]
+'''
+
+[[package]]
+dir = "src/opam-gui-js"
+kind = "program"
+name = "opam-gui-js"
+mode = "javascript"
+[package.fields]
+dune-stanzas = """
+ (js_of_ocaml (flags (:standard --no-sourcemap)))
+"""
+dune-libraries = "opamgui_common ez-api.xhr"
+dune-trailer = """
+(install
+ (files (main.bc.js as www/js/opam-gui-js.js))
+ (section share)
+ (package opam-gui-js))
+"""
+
+[package.dependencies]
+vue-jsoo = "0.1"
+ezjs_min = "0.1"

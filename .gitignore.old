@@ -1,0 +1,9 @@
+/www
+/bin
+/share
+config
+*.merlin
+_build
+/Makefile.config
+*~
+/src/config/pConfig.ml

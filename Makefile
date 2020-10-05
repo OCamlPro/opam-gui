@@ -1,54 +1,48 @@
-PROJECT_NAME:=opam-gui
-VERSION:=1.0
-WWW_DIR:=share/$(PROJECT_NAME)/www
 
-PORT:=9988
--include Makefile.config
+.PHONY: all build-deps doc sphinx odoc view fmt fmt-check install dev-deps test
+DEV_DEPS := merlin ocamlformat odoc ppx_expect ppx_inline_test
 
-.EXPORT_ALL_VARIABLES:
+all: build
 
-all: build website openapi
-
-build: config
-	dune build --profile release
-	mkdir -p bin
-	cp -f _build/default/src/api/opam_gui.exe bin/opam-gui
-
-website:
-	mkdir -p $(WWW_DIR)
-	cp -f _build/default/src/ui/main_ui.bc.js $(WWW_DIR)/$(PROJECT_NAME)-ui.js
-	rsync -ar static/* $(WWW_DIR)
-	cp config/info.json $(WWW_DIR)
-	sed -i 's/%{project_name}/$(PROJECT_NAME)/g' $(WWW_DIR)/index.html
-
-clean:
-	dune clean
-
-install:
-	dune install
-	mkdir -p $$OPAM_SWITCH_PREFIX/share/$(PROJECT_NAME)
-	cp -R www $$OPAM_SWITCH_PREFIX/share/$(PROJECT_NAME)/www
+build:
+	opam exec -- dune build @install
+	cp -f _build/default/src/opam-gui/main.exe opam-gui
+	cp -f _build/default/src/opam-gui-js/main.exe opam-gui-js
 
 build-deps:
-	opam install --deps-only .
+	if ! [ -e _opam ]; then \
+	   opam switch create . --empty && \
+	   opam install ocaml.4.10.0 ; \
+	fi
+	opam install ./*.opam --deps-only
 
-Makefile.config: Makefile
-	echo > Makefile.config
-	echo PORT:=$(PORT) >> Makefile.config
+sphinx:
+	sphinx-build sphinx docs/sphinx
 
-src/config/pConfig.ml: Makefile.config
-	echo "let project = {|$(PROJECT_NAME)|}" > src/config/pConfig.ml
-	echo "let port = $(PORT)" >> src/config/pConfig.ml
+doc:
+	opam exec -- dune build @doc
+	rsync -auv --delete _build/default/_doc/_html/. docs/doc
 
-.PHONY: config
+view:
+	xdg-open file://$$(pwd)/docs/index.html
 
-config: config/info.json src/config/pConfig.ml
+fmt:
+	opam exec -- dune build @fmt --auto-promote
 
-init: build-deps config
+fmt-check:
+	opam exec -- dune build @fmt
 
-git-init:
-	rm -rf .git
-	git init
+install:
+	opam exec -- dune install
 
-openapi: _build/default/src/api/openapi.exe
-	@_build/default/src/api/openapi.exe --version $(VERSION) --title "$(PROJECT_NAME) API" --contact "$(CONTACT_EMAIL)" --servers "api" $(API_HOST) -o www/openapi.json
+opam:
+	opam pin -k path .
+
+uninstall:
+	opam exec -- dune uninstall
+
+dev-deps:
+	opam install ./*.opam --deps-only --with-doc --with-test
+
+test:
+	opam exec -- dune build @runtest

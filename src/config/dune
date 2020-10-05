@@ -1,4 +1,0 @@
-(library
- (name opamgui_config)
- (wrapped false)
- (modules pConfig))

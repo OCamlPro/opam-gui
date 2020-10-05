@@ -38,15 +38,15 @@ build: [
 depends: [
   "ocaml" {>= "4.10.0"}
   "dune" {>= "2.6.0"}
+  "vue-jsoo" {>= "0.1"}
+  "re" {>= "1.9.0" & < "2.0.0"}
   "opam-state" {>= "2.0.7" & < "3.0.0"}
+  "opam-file-format" {>= "2.1.0" & < "3.0.0"}
+  "ocplib_stuff" {>= "0.2.2" & < "1.0.0"}
   "geoip" {>= "0.0.3" & < "1.0.0"}
   "ez_file" {>= "0.2.0" & < "1.0.0"}
   "cohttp-lwt-unix" {>= "2.5.4" & < "3.0.0"}
-  "re" {>= "1.9.0" & < "2.0.0"}
-  "opam-file-format" {>= "2.1.0" & < "3.0.0"}
-  "ocplib_stuff" {>= "0.2.2" & < "1.0.0"}
   "calendar" {>= "2.04"}
-  "opam-gui-js" {= version}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}
